@@ -33,9 +33,32 @@
 }
 .lang-toggle:hover { border-color:var(--color-primary); color:var(--text-primary); }
 
+/* Mobile hamburger menu */
+.header-menu-btn {
+  display:none; background:none; border:none; color:var(--text-primary);
+  font-size:1.5rem; cursor:pointer; padding:var(--space-2); min-height:44px; min-width:44px;
+  align-items:center; justify-content:center; border-radius:var(--radius-md);
+}
+.header-menu-btn:hover { background:var(--bg-glass); }
+.header-menu-btn:focus-visible { outline:2px solid var(--color-primary); outline-offset:2px; }
+
 @media (max-width:768px) {
-  .header-nav a span { display:none; }
-  .header-nav { gap:var(--space-1); }
+  .header-menu-btn { display:flex; }
+  .header-nav {
+    position:fixed; top:60px; left:0; right:0; bottom:0;
+    flex-direction:column; align-items:stretch; gap:0;
+    background:rgba(10,10,20,0.97); backdrop-filter:blur(20px);
+    padding:var(--space-4) var(--space-6);
+    transform:translateX(100%); transition:transform 0.3s ease;
+    z-index:var(--z-header); overflow-y:auto;
+  }
+  .header-nav.open { transform:translateX(0); }
+  .header-nav a {
+    font-size:var(--text-lg); padding:var(--space-4) var(--space-3);
+    border-bottom:1px solid var(--border-subtle);
+  }
+  .header-nav a span { display:inline; margin-right:var(--space-2); }
+  .lang-toggle { margin-top:var(--space-4); width:100%; text-align:center; }
 }
 
 /* --- Hero --- */

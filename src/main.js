@@ -17,6 +17,8 @@ import { renderGlossary } from './components/glossary.js';
 import { renderMaps } from './components/maps.js';
 import { renderChatbot } from './components/chatbot.js';
 import { t, getLang } from './utils/i18n.js';
+import { initAnalytics } from './utils/analytics.js';
+import { initPerformanceMonitoring, addResourceHints } from './utils/performance.js';
 
 /** Component references for re-rendering on language change */
 const components = {};
@@ -27,27 +29,76 @@ const components = {};
 function init() {
   document.documentElement.lang = getLang();
 
+  // Initialize Google Analytics 4
+  initAnalytics();
+
+  // Performance monitoring — Web Vitals reporting
+  initPerformanceMonitoring();
+  addResourceHints();
+
   // Render Hero
   renderHero();
 
-  // Render all components
-  components.header = renderHeader(
-    document.getElementById('app-header'),
-    handleLangChange
-  );
-
-  components.journey = renderJourneyMap(document.getElementById('journey'));
-  components.timeline = renderTimeline(document.getElementById('timeline'));
-  components.quiz = renderQuiz(document.getElementById('quiz'));
-  components.glossary = renderGlossary(document.getElementById('glossary'));
-  components.maps = renderMaps(document.getElementById('maps'));
-  components.chatbot = renderChatbot(document.getElementById('chatbot-container'));
+  // Render all components with error isolation
+  components.header = safeRender('app-header', (el) => renderHeader(el, handleLangChange));
+  components.journey = safeRender('journey', renderJourneyMap);
+  components.timeline = safeRender('timeline', renderTimeline);
+  components.quiz = safeRender('quiz', renderQuiz);
+  components.glossary = safeRender('glossary', renderGlossary);
+  components.maps = safeRender('maps', renderMaps);
+  components.chatbot = safeRender('chatbot-container', renderChatbot);
 
   // Intersection Observer for scroll animations
   initScrollReveal();
 
+  // Focus management for hash navigation
+  initFocusManagement();
+
   // Register Service Worker
   registerServiceWorker();
+}
+
+/**
+ * Safely render a component — catches errors so one broken component
+ * does not crash the entire application
+ * @param {string} containerId - DOM element ID
+ * @param {Function} renderFn - Render function to call with the container
+ * @returns {Object|null} Component handle or null on failure
+ */
+function safeRender(containerId, renderFn) {
+  try {
+    const el = document.getElementById(containerId);
+    if (!el) return null;
+    return renderFn(el);
+  } catch (err) {
+    console.error(`[ElectIQ] Failed to render component "${containerId}":`, err);
+    const el = document.getElementById(containerId);
+    if (el) {
+      el.innerHTML = `<div class="glass-card" style="padding:var(--space-6);text-align:center;" role="alert">
+        <p style="color:var(--text-muted);">This section could not be loaded. Please refresh the page.</p>
+      </div>`;
+    }
+    return null;
+  }
+}
+
+/**
+ * Manage focus when navigating between sections via hash links
+ */
+function initFocusManagement() {
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const targetId = link.getAttribute('href').slice(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        // Smooth scroll + focus management
+        setTimeout(() => {
+          target.setAttribute('tabindex', '-1');
+          target.focus({ preventScroll: true });
+        }, 400);
+      }
+    });
+  });
 }
 
 /**

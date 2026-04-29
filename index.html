@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" 
         content="default-src 'self'; 
-               script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com; 
+               script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.googletagmanager.com; 
                style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
                font-src https://fonts.gstatic.com; 
-               img-src 'self' data: https://*.googleapis.com https://*.gstatic.com; 
-               connect-src 'self' https://generativelanguage.googleapis.com; 
+               img-src 'self' data: https://*.googleapis.com https://*.gstatic.com https://www.googletagmanager.com; 
+               connect-src 'self' https://generativelanguage.googleapis.com https://www.google-analytics.com https://analytics.google.com; 
                frame-src https://www.google.com https://maps.google.com;" />
 
   <!-- SEO -->
@@ -24,6 +24,48 @@
   <meta property="og:description" content="Interactive election education assistant for Indian voters. Powered by Google Gemini AI." />
   <meta property="og:type" content="website" />
 
+  <!-- Structured Data — JSON-LD for Google Rich Results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ElectIQ",
+    "description": "India's smartest AI-powered election education assistant. Learn voter registration, EVM, timelines, and Indian democracy interactively.",
+    "url": "https://electiq.app",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+    "author": { "@type": "Organization", "name": "ElectIQ Team" },
+    "inLanguage": ["en", "hi"],
+    "audience": { "@type": "Audience", "audienceType": "Indian Voters" },
+    "keywords": "Indian elections, voter education, EVM, election process, voter registration, ECI, democracy",
+    "isAccessibleForFree": true
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I register to vote in India?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Fill Form 6 online at NVSP (voters.eci.gov.in) or visit your nearest ERO office. You need age proof, address proof, and a passport-size photo." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is an EVM (Electronic Voting Machine)?",
+        "acceptedAnswer": { "@type": "Answer", "text": "EVMs are standalone electronic devices used for casting votes in India. They have no wireless connectivity and run on batteries, making them usable in remote areas." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is NOTA in Indian elections?",
+        "acceptedAnswer": { "@type": "Answer", "text": "NOTA (None of the Above) is an option on every EVM that allows voters to reject all candidates. However, it currently has no legal consequence on election results." }
+      }
+    ]
+  }
+  </script>
+
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗳️</text></svg>" />
@@ -35,6 +77,11 @@
 
   <!-- Google Charts -->
   <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <!-- Google Analytics 4 — loaded conditionally via env -->
+  <script>
+    window.__GA_ID__ = '';
+  </script>
 
   <!-- Styles — served from public/ so browser receives real CSS, not Vite JS modules -->
   <link rel="stylesheet" href="/app.css" />

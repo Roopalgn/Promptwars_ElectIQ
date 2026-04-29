@@ -6,6 +6,18 @@
 import { t } from '../utils/i18n.js';
 
 /**
+ * Get Maps API key from environment variable
+ * @returns {string}
+ */
+function getMapsApiKey() {
+  try {
+    return import.meta.env.VITE_MAPS_KEY || '';
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Render the Maps section
  * @param {HTMLElement} container
  */
@@ -35,7 +47,7 @@ export function renderMaps(container) {
         <div class="maps-container">
           <iframe
             class="maps-iframe"
-            src="https://www.google.com/maps/embed/v1/search?q=Election+Commission+offices+India&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
+            src="https://www.google.com/maps/embed/v1/search?q=Election+Commission+offices+India&key=${getMapsApiKey()}"
             allowfullscreen
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"

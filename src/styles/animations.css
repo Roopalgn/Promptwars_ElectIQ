@@ -84,3 +84,44 @@
 .reveal { opacity:1; transform:translateY(0); transition:all 0.7s cubic-bezier(0.4,0,0.2,1); }
 .reveal.animate { opacity:0; transform:translateY(30px); }
 .reveal.animate.visible { opacity:1; transform:translateY(0); }
+
+/* --- Reduced Motion — WCAG 2.1 AAA --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-fade-in-down,
+  .animate-scale-in,
+  .animate-slide-right,
+  .animate-slide-left,
+  .animate-float {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .delay-1, .delay-2, .delay-3, .delay-4, .delay-5, .delay-6 {
+    opacity: 1 !important;
+    animation-delay: 0ms !important;
+  }
+
+  .gradient-text-animated {
+    animation: none !important;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

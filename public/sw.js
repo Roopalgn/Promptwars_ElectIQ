@@ -1,11 +1,9 @@
-const CACHE_NAME = 'electiq-v1';
+const CACHE_NAME = 'electiq-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/src/main.js',
-  '/src/styles/main.css',
-  '/src/styles/components.css',
-  '/src/styles/animations.css'
+  '/app.css',
+  '/manifest.json'
 ];
 
 // Install — cache app shell
@@ -30,7 +28,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch — cache-first for static, network-first for API
+// Fetch — stale-while-revalidate for static, network-first for API
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -46,17 +44,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets
+  // Skip Google Analytics requests — never cache
+  if (url.hostname === 'www.google-analytics.com' || url.hostname === 'www.googletagmanager.com') {
+    event.respondWith(fetch(event.request).catch(() => new Response('', { status: 499 })));
+    return;
+  }
+
+  // Stale-while-revalidate for all other assets (handles hashed Vite filenames)
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      if (cached) { return cached; }
-      return fetch(event.request).then((response) => {
-        if (response.status === 200 && response.type === 'basic') {
+      const fetchPromise = fetch(event.request).then((response) => {
+        if (response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return response;
-      });
+      }).catch(() => cached);
+
+      return cached || fetchPromise;
     }).catch(() => {
       if (event.request.destination === 'document') {
         return caches.match('/index.html');

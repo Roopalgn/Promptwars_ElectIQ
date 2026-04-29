@@ -113,6 +113,34 @@ export function renderChatbot(container) {
       }
     });
 
+    // Focus trap when dialog is open
+    if (isOpen) {
+      const dialog = container.querySelector('#chatbot-dialog');
+      if (dialog) {
+        dialog.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            isOpen = false;
+            render();
+            const toggle = container.querySelector('#chatbot-toggle-btn');
+            if (toggle) toggle.focus();
+            return;
+          }
+          if (e.key !== 'Tab') return;
+          const focusable = dialog.querySelectorAll('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        });
+      }
+    }
+
     // Suggestion chips
     container.querySelectorAll('.chatbot-suggestion').forEach(btn => {
       btn.addEventListener('click', () => {
