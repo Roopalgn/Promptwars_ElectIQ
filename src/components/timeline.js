@@ -37,13 +37,17 @@ export function renderTimeline(container) {
         <div class="glass-card" style="padding:var(--space-6);">
           <h3 style="margin-bottom:var(--space-4);font-size:var(--text-xl);">📅 Phase Details</h3>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);">
-            ${timelineEvents.filter(e => e.category === 'polling').map(e => `
+            ${timelineEvents.map(e => {
+              const cat = timelineCategories.find(c => c.id === e.category);
+              const catLabel = cat ? localize(cat.label) : e.category;
+              return `
               <div style="padding:var(--space-3);border-left:3px solid ${e.color};background:var(--bg-glass);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
-                <div style="font-weight:700;color:var(--text-primary);font-size:var(--text-sm);">${localize(e.label)}</div>
+                <span class="badge badge-info" style="background:${e.color}22;color:${e.color};border-color:${e.color}55;margin-bottom:var(--space-2);">${catLabel}</span>
+                <div style="font-weight:700;color:var(--text-primary);font-size:var(--text-sm);margin-top:var(--space-1);">${localize(e.label)}</div>
                 <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px;">${formatDate(e.startDate)}</div>
                 <div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:4px;">${localize(e.description)}</div>
               </div>
-            `).join('')}
+            `; }).join('')}
           </div>
         </div>
       </div>
@@ -58,10 +62,24 @@ export function renderTimeline(container) {
 }
 
 /** Initialize and draw the Google Charts timeline */
-function loadChart() {
+function loadChart(retries = 0) {
+  const chartEl = document.getElementById('timeline-chart');
+  if (!chartEl) { return; }
+
+  // If Google Charts loader is not yet available, retry up to 20 times (10s total)
   if (typeof google === 'undefined' || !google.charts) {
-    document.getElementById('timeline-chart').innerHTML =
-      '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Unable to load Google Charts. Please check your internet connection.</p>';
+    if (retries < 20) {
+      setTimeout(() => loadChart(retries + 1), 500);
+      return;
+    }
+    chartEl.innerHTML =
+      '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Unable to load Google Charts. Please check your internet connection or browser extensions.</p>';
+    return;
+  }
+
+  // If timeline package already loaded, draw directly
+  if (google.visualization && google.visualization.Timeline) {
+    drawTimeline();
     return;
   }
 

@@ -4,8 +4,11 @@
  */
 
 import { sanitizeInput } from '../utils/sanitizer.js';
+import { getOfflineAnswer, GENERIC_FALLBACK } from './offline-knowledge.js';
 
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+/** Models to try in order — falls back to a stable model if newer is unavailable */
+const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-flash'];
 const MAX_INPUT_LENGTH = 500;
 const MAX_REQUESTS_PER_MIN = 10;
 const RETRY_DELAYS = [1000, 2000, 4000];
@@ -78,25 +81,34 @@ function getApiKey() {
 }
 
 /**
- * Send a message to Gemini with retry logic
+ * Send a message to Gemini with retry logic and offline fallback.
+ * Always returns a useful answer — uses an offline knowledge base
+ * when no API key is configured or the API fails.
  * @param {string} userMessage - User's question
  * @param {Array} history - Conversation history [{role, text}]
- * @returns {Promise<string>} AI response text
+ * @returns {Promise<string>} AI response text (always succeeds)
  */
 export async function askGemini(userMessage, history = []) {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error('API_KEY_MISSING');
-  }
-
-  if (!rateLimiter.tryConsume()) {
-    throw new Error('RATE_LIMITED');
-  }
-
-  // Sanitize and truncate input
+  // Sanitize and truncate input first — input validation always runs
   const clean = sanitizeInput(userMessage).slice(0, MAX_INPUT_LENGTH);
   if (!clean) {
     throw new Error('EMPTY_INPUT');
+  }
+
+  const apiKey = getApiKey();
+
+  // No API key — answer from offline knowledge base
+  if (!apiKey) {
+    const offline = getOfflineAnswer(clean);
+    return (offline || GENERIC_FALLBACK) +
+      '\n\n_Tip: Set `VITE_GEMINI_KEY` in your `.env` file for full AI conversations._';
+  }
+
+  if (!rateLimiter.tryConsume()) {
+    // Rate limited — try offline knowledge before failing
+    const offline = getOfflineAnswer(clean);
+    if (offline) return offline + '\n\n_Rate limit reached — answered from offline knowledge base._';
+    throw new Error('RATE_LIMITED');
   }
 
   // Build conversation contents
@@ -131,46 +143,82 @@ export async function askGemini(userMessage, history = []) {
     ]
   };
 
-  // Retry with exponential backoff
+  // Try each model until one succeeds
   let lastError;
-  for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+  for (const model of MODELS) {
     try {
-      const res = await fetch(`${API_URL}?key=${apiKey}`, {
+      const text = await callModel(model, apiKey, body);
+      if (text) return text;
+    } catch (err) {
+      lastError = err;
+      // 404/400 means model unavailable — try next; other errors fall through to fallback
+      const msg = String(err && err.message);
+      if (!/404|400|NOT_FOUND/i.test(msg)) break;
+    }
+  }
+
+  // All models failed — fall back to offline knowledge base so the user still gets an answer
+  const offline = getOfflineAnswer(clean);
+  if (offline) {
+    return offline + '\n\n_AI service unavailable right now — answered from offline knowledge base._';
+  }
+  // Last resort: rethrow the most recent error so the UI can show a friendly message
+  throw lastError || new Error('UNKNOWN_ERROR');
+}
+
+/**
+ * Call a single Gemini model endpoint with retry logic.
+ * @param {string} model - Model name
+ * @param {string} apiKey - API key
+ * @param {Object} body - Request body
+ * @returns {Promise<string>} Generated text
+ */
+async function callModel(model, apiKey, body) {
+  const url = `${API_BASE}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+    let res;
+    try {
+      res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
-      if (res.status === 429 || res.status === 503) {
-        lastError = new Error(`API returned ${res.status}`);
-        if (attempt < RETRY_DELAYS.length) {
-          await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
-          continue;
-        }
-        throw lastError;
-      }
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData?.error?.message || `API error: ${res.status}`);
-      }
-
-      const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) {
-        throw new Error('Empty response from Gemini');
-      }
-      return text;
-    } catch (err) {
-      lastError = err;
-      if (attempt < RETRY_DELAYS.length && (err.message.includes('503') || err.message.includes('429'))) {
+    } catch (networkErr) {
+      // Network failure — retry with backoff
+      if (attempt < RETRY_DELAYS.length) {
         await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
         continue;
       }
-      throw err;
+      throw new Error('NETWORK_ERROR');
     }
+
+    if (res.status === 429 || res.status === 503) {
+      if (attempt < RETRY_DELAYS.length) {
+        await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
+        continue;
+      }
+      throw new Error(`API returned ${res.status}`);
+    }
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData?.error?.message || `API error: ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+      // Could be safety block or empty — return null so caller falls back
+      const blockReason = data?.promptFeedback?.blockReason;
+      if (blockReason) {
+        throw new Error(`SAFETY_BLOCK:${blockReason}`);
+      }
+      throw new Error('Empty response from Gemini');
+    }
+    return text;
   }
-  throw lastError;
+  throw new Error('MAX_RETRIES_EXCEEDED');
 }
 
 /**

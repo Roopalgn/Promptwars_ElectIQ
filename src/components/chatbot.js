@@ -47,7 +47,7 @@ export function renderChatbot(container) {
         <div class="chatbot-messages" id="chatbot-messages" aria-live="polite" aria-label="Chat messages">
           ${messages.length === 0 ? `
             <div class="chatbot-msg bot">
-              <p>${isApiKeyConfigured() ? t('chat.welcome') : t('chat.configKey')}</p>
+              <p>${isApiKeyConfigured() ? t('chat.welcome') : t('chat.welcome.offline')}</p>
             </div>
           ` : ''}
           ${messages.map(m => `
@@ -62,7 +62,7 @@ export function renderChatbot(container) {
           ` : ''}
         </div>
 
-        ${messages.length === 0 && isApiKeyConfigured() ? `
+        ${messages.length === 0 ? `
           <div class="chatbot-suggestions" role="list" aria-label="Suggested questions">
             ${SUGGESTIONS.map(s => `
               <button class="chatbot-suggestion" role="listitem" data-suggestion="${s}">${s}</button>
@@ -82,11 +82,11 @@ export function renderChatbot(container) {
                  placeholder="${t('chat.placeholder')}"
                  maxlength="500"
                  autocomplete="off"
-                 ${!isApiKeyConfigured() || isLoading ? 'disabled' : ''} />
+                 ${isLoading ? 'disabled' : ''} />
           <button class="chatbot-send"
                   id="chatbot-send-btn"
                   aria-label="Send message"
-                  ${!isApiKeyConfigured() || isLoading ? 'disabled' : ''}>
+                  ${isLoading ? 'disabled' : ''}>
             ➤
           </button>
         </div>
@@ -193,10 +193,17 @@ export function renderChatbot(container) {
       messages.push({ role: 'bot', text: response });
     } catch (err) {
       let errorMsg = t('chat.error');
-      if (err.message === 'RATE_LIMITED') {
-        errorMsg = '⚠️ Rate limit reached. Please wait a moment before asking another question.';
-      } else if (err.message === 'API_KEY_MISSING') {
+      const m = String(err && err.message);
+      if (m === 'RATE_LIMITED') {
+        errorMsg = '⚠️ Rate limit reached (10 queries / minute). Please wait a moment.';
+      } else if (m === 'API_KEY_MISSING') {
         errorMsg = t('chat.configKey');
+      } else if (m === 'NETWORK_ERROR') {
+        errorMsg = '🌐 Could not reach the AI service. Check your internet connection and try again.';
+      } else if (m.startsWith('SAFETY_BLOCK')) {
+        errorMsg = '🛡️ That question was blocked by content safety. Please rephrase your election-related question.';
+      } else if (m === 'EMPTY_INPUT') {
+        errorMsg = 'Please type a question first.';
       }
       messages.push({ role: 'bot', text: errorMsg });
     } finally {

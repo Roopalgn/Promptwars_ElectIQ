@@ -16,6 +16,8 @@ import { renderQuiz } from './components/quiz.js';
 import { renderGlossary } from './components/glossary.js';
 import { renderMaps } from './components/maps.js';
 import { renderChatbot } from './components/chatbot.js';
+import { renderCountdown } from './components/countdown.js';
+import { renderEligibility } from './components/eligibility.js';
 import { t, getLang } from './utils/i18n.js';
 import { initAnalytics } from './utils/analytics.js';
 import { initPerformanceMonitoring, addResourceHints } from './utils/performance.js';
@@ -41,8 +43,10 @@ function init() {
 
   // Render all components with error isolation
   components.header = safeRender('app-header', (el) => renderHeader(el, handleLangChange));
+  components.countdown = safeRender('countdown', renderCountdown);
   components.journey = safeRender('journey', renderJourneyMap);
   components.timeline = safeRender('timeline', renderTimeline);
+  components.eligibility = safeRender('eligibility', renderEligibility);
   components.quiz = safeRender('quiz', renderQuiz);
   components.glossary = safeRender('glossary', renderGlossary);
   components.maps = safeRender('maps', renderMaps);

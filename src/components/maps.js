@@ -6,15 +6,20 @@
 import { t } from '../utils/i18n.js';
 
 /**
- * Get Maps API key from environment variable
+ * Build a Google Maps embed URL.
+ * If a Maps API key is configured, use the official Embed API (better UX).
+ * Otherwise, fall back to the keyless `?output=embed` URL which works
+ * everywhere without authentication.
  * @returns {string}
  */
-function getMapsApiKey() {
-  try {
-    return import.meta.env.VITE_MAPS_KEY || '';
-  } catch {
-    return '';
+function buildMapsEmbedUrl() {
+  let key = '';
+  try { key = import.meta.env.VITE_MAPS_KEY || ''; } catch { /* env unavailable */ }
+  if (key && key !== 'your_maps_api_key_here') {
+    return `https://www.google.com/maps/embed/v1/search?q=Election+Commission+offices+India&key=${encodeURIComponent(key)}`;
   }
+  // Keyless fallback — no API key required, works in all environments
+  return 'https://maps.google.com/maps?q=Election+Commission+of+India,+Nirvachan+Sadan,+New+Delhi&z=5&output=embed';
 }
 
 /**
@@ -32,7 +37,7 @@ export function renderMaps(container) {
       <div class="reveal">
         <div class="glass-card" style="padding:var(--space-6);margin-bottom:var(--space-6);">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:var(--space-4);">
-            <a href="https://electoralsearch.in/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="text-align:center;">
+            <a href="https://electoralsearch.eci.gov.in/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="text-align:center;">
               🔍 Search Your Name on Electoral Roll
             </a>
             <a href="https://voters.eci.gov.in/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="text-align:center;">
@@ -47,7 +52,7 @@ export function renderMaps(container) {
         <div class="maps-container">
           <iframe
             class="maps-iframe"
-            src="https://www.google.com/maps/embed/v1/search?q=Election+Commission+offices+India&key=${getMapsApiKey()}"
+            src="${buildMapsEmbedUrl()}"
             allowfullscreen
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"

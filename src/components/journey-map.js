@@ -136,10 +136,12 @@ export function renderJourneyMap(container) {
       nextBtn.addEventListener('click', () => { state.next(); render(); });
     }
 
-    // Keyboard navigation
+    // Keyboard navigation — only act when focus is inside this section
     container.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { state.next(); render(); }
-      if (e.key === 'ArrowLeft') { state.prev(); render(); }
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') { return; }
+      if (e.key === 'ArrowRight' && state.current < state.total) { state.next(); render(); }
+      if (e.key === 'ArrowLeft' && state.current > 1) { state.prev(); render(); }
     });
   };
 

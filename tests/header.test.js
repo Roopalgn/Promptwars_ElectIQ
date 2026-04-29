@@ -32,7 +32,7 @@ describe('Header — Navigation', () => {
     const { renderHeader } = await import('../src/components/header.js');
     renderHeader(container, vi.fn());
     const links = container.querySelectorAll('.header-nav a');
-    expect(links.length).toBe(5);
+    expect(links.length).toBe(6);
   });
 
   it('includes hamburger menu button', async () => {
