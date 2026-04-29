@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; 
+               script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com; 
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+               font-src https://fonts.gstatic.com; 
+               img-src 'self' data: https://*.googleapis.com https://*.gstatic.com; 
+               connect-src 'self' https://generativelanguage.googleapis.com; 
+               frame-src https://www.google.com https://maps.google.com;" />
+
+  <!-- SEO -->
+  <title>ElectIQ — India's Smartest Election Education Assistant</title>
+  <meta name="description" content="Learn the Indian election process interactively — voter registration, EVM, timelines, and more. Powered by Google Gemini AI." />
+  <meta name="keywords" content="india elections, voter education, EVM, election process, voter registration, ECI" />
+  <meta name="author" content="ElectIQ Team" />
+  <meta name="theme-color" content="#FF6B35" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ElectIQ — Know Your Vote. Own Your Voice." />
+  <meta property="og:description" content="Interactive election education assistant for Indian voters. Powered by Google Gemini AI." />
+  <meta property="og:type" content="website" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗳️</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Google Charts -->
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <!-- Styles — served from public/ so browser receives real CSS, not Vite JS modules -->
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <!-- Skip Navigation (Accessibility) -->
+  <a href="#main-content" class="skip-link" id="skip-nav">Skip to main content</a>
+
+  <!-- Header -->
+  <header id="app-header" role="banner"></header>
+
+  <!-- Main Content -->
+  <main id="main-content" role="main" tabindex="-1">
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section" aria-labelledby="hero-title"></section>
+
+    <!-- Journey Map -->
+    <section id="journey" class="section" aria-labelledby="journey-title"></section>
+
+    <!-- Timeline -->
+    <section id="timeline" class="section" aria-labelledby="timeline-title"></section>
+
+    <!-- Quiz -->
+    <section id="quiz" class="section" aria-labelledby="quiz-title"></section>
+
+    <!-- Glossary -->
+    <section id="glossary" class="section" aria-labelledby="glossary-title"></section>
+
+    <!-- Maps -->
+    <section id="maps" class="section" aria-labelledby="maps-title"></section>
+  </main>
+
+  <!-- Chatbot Widget -->
+  <div id="chatbot-container" role="complementary" aria-label="AI Election Assistant"></div>
+
+  <!-- Footer -->
+  <footer id="app-footer" role="contentinfo">
+    <div class="footer-inner">
+      <p>ElectIQ © 2026 — Built with ❤️ using Google Antigravity</p>
+      <p class="footer-disclaimer">Data sourced from the Election Commission of India (ECI). This is an educational tool and does not represent official ECI communication.</p>
+    </div>
+  </footer>
+
+  <!-- App Entry -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

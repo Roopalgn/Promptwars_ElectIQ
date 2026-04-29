@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Competition brief (not part of submission)
+info.md
+
+# Lock file (keeps repo small for 10MB limit)
+package-lock.json
