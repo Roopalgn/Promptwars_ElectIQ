@@ -24,8 +24,5 @@ coverage/
 *.log
 npm-debug.log*
 
-# Competition brief (not part of submission)
-info.md
-
 # Lock file (keeps repo small for 10MB limit)
 package-lock.json
