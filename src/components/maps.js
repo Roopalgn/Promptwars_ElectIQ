@@ -52,18 +52,19 @@ export function renderMaps(container) {
         <div class="maps-container">
           <iframe
             class="maps-iframe"
-            src="${buildMapsEmbedUrl()}"
+            src="https://maps.google.com/maps?q=Nirvachan+Sadan+Election+Commission+of+India+New+Delhi&output=embed&z=5"
             allowfullscreen
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
-            title="Map showing Election Commission offices across India"
-            aria-label="Interactive Google Map showing Election Commission offices in India">
+            title="Map showing Election Commission of India headquarters, New Delhi"
+            aria-label="Interactive Google Map centered on India showing ECI office locations">
           </iframe>
-          <noscript>
-            <div class="maps-fallback">
-              <p>Map requires JavaScript. Visit <a href="https://www.eci.gov.in/contact-us" target="_blank" rel="noopener noreferrer">ECI Contact Us</a> to find your nearest office.</p>
-            </div>
-          </noscript>
+        </div>
+
+        <div class="glass-card" style="padding:var(--space-4);margin-top:var(--space-4);">
+          <p style="font-size:var(--text-sm);color:var(--text-muted);text-align:center;margin:0 auto;">
+            🗺️ <a href="https://maps.google.com/maps?q=Election+Commission+office+near+me" target="_blank" rel="noopener noreferrer">Find your nearest Election Commission office on Google Maps →</a>
+          </p>
         </div>
 
         <div class="glass-card" style="padding:var(--space-5);margin-top:var(--space-6);">

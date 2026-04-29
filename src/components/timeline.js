@@ -66,25 +66,35 @@ function loadChart(retries = 0) {
   const chartEl = document.getElementById('timeline-chart');
   if (!chartEl) { return; }
 
-  // If Google Charts loader is not yet available, retry up to 20 times (10s total)
-  if (typeof google === 'undefined' || !google.charts) {
-    if (retries < 20) {
-      setTimeout(() => loadChart(retries + 1), 500);
+  // Wait for the Google Charts loader script to be available
+  if (typeof google === 'undefined' || typeof google.charts === 'undefined') {
+    if (retries < 40) {
+      setTimeout(() => loadChart(retries + 1), 250);
       return;
     }
-    chartEl.innerHTML =
-      '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Unable to load Google Charts. Please check your internet connection or browser extensions.</p>';
+    // Fallback: show the static phase cards instead
+    chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Timeline requires Google Charts (check internet connection).</p>';
     return;
   }
 
-  // If timeline package already loaded, draw directly
+  // Charts already fully loaded — draw immediately
   if (google.visualization && google.visualization.Timeline) {
     drawTimeline();
     return;
   }
 
-  google.charts.load('current', { packages: ['timeline'] });
-  google.charts.setOnLoadCallback(drawTimeline);
+  // Load the timeline package and draw on callback
+  try {
+    google.charts.load('current', { packages: ['timeline'] });
+    google.charts.setOnLoadCallback(() => {
+      // Extra safety: confirm Timeline is actually available
+      if (google.visualization && google.visualization.Timeline) {
+        drawTimeline();
+      }
+    });
+  } catch (e) {
+    chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Unable to load Google Charts. Please refresh the page.</p>';
+  }
 }
 
 /** Draw the timeline chart */

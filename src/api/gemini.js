@@ -8,7 +8,7 @@ import { getOfflineAnswer, GENERIC_FALLBACK } from './offline-knowledge.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 /** Models to try in order — falls back to a stable model if newer is unavailable */
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-flash'];
+const MODELS = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.0-pro'];
 const MAX_INPUT_LENGTH = 500;
 const MAX_REQUESTS_PER_MIN = 10;
 const RETRY_DELAYS = [1000, 2000, 4000];
@@ -151,9 +151,13 @@ export async function askGemini(userMessage, history = []) {
       if (text) return text;
     } catch (err) {
       lastError = err;
-      // 404/400 means model unavailable — try next; other errors fall through to fallback
       const msg = String(err && err.message);
-      if (!/404|400|NOT_FOUND/i.test(msg)) break;
+      // Only continue trying next model for model-not-found errors
+      // For auth errors (403), network errors, etc. — fall through to offline fallback
+      if (/404|400|NOT_FOUND|models\/gemini/i.test(msg)) {
+        continue; // Try next model
+      }
+      break; // Non-model error — stop retrying
     }
   }
 
