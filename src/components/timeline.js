@@ -1,5 +1,5 @@
 /**
- * Google Charts Timeline visualization
+ * Custom CSS Timeline visualization
  * @module components/timeline
  */
 
@@ -7,146 +7,159 @@ import { timelineEvents, timelineCategories } from '../data/timeline-events.js';
 import { t, localize } from '../utils/i18n.js';
 
 /**
- * Render the Timeline section with Google Charts
+ * Render the Timeline section
  * @param {HTMLElement} container
  */
 export function renderTimeline(container) {
   const render = () => {
     container.innerHTML = `
+      <style>
+        .custom-timeline {
+          position: relative;
+          max-width: 1000px;
+          margin: var(--space-10) auto;
+          padding: var(--space-4) 0;
+        }
+        .custom-timeline::after {
+          content: '';
+          position: absolute;
+          width: 4px;
+          background: linear-gradient(to bottom, var(--color-primary), var(--color-secondary));
+          top: 0;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          border-radius: 4px;
+          z-index: 0;
+        }
+        .timeline-node {
+          padding: 10px 40px;
+          position: relative;
+          width: 50%;
+          box-sizing: border-box;
+          z-index: 1;
+        }
+        .timeline-node.left { left: 0; }
+        .timeline-node.right { left: 50%; }
+        
+        .timeline-dot {
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          right: -12px;
+          background-color: var(--bg-surface);
+          border: 4px solid var(--color-primary);
+          top: 24px;
+          border-radius: 50%;
+          z-index: 2;
+          box-shadow: var(--shadow-glow);
+          transition: transform var(--transition-fast);
+        }
+        .timeline-node.right .timeline-dot {
+          left: -12px;
+        }
+        
+        .timeline-content {
+          padding: var(--space-5);
+          background: var(--bg-glass);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-lg);
+          position: relative;
+          transition: all var(--transition-base);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+        }
+        .timeline-content:hover {
+          transform: translateY(-5px);
+          box-shadow: var(--shadow-md);
+        }
+        .timeline-node:hover .timeline-dot {
+          transform: scale(1.3);
+        }
+        
+        .timeline-date {
+          font-family: var(--font-display);
+          color: var(--color-primary-light);
+          font-weight: 700;
+          font-size: var(--text-sm);
+          margin-bottom: var(--space-2);
+          letter-spacing: 0.5px;
+        }
+        .timeline-event-title {
+          font-size: var(--text-xl);
+          font-weight: 700;
+          margin-bottom: var(--space-2);
+          color: var(--text-primary);
+          padding-right: 80px; /* Space for the absolute badge */
+        }
+        .timeline-desc {
+          color: var(--text-secondary);
+          font-size: var(--text-sm);
+          line-height: 1.6;
+        }
+        
+        @media screen and (max-width: 768px) {
+          .custom-timeline::after {
+            left: 31px;
+            transform: none;
+          }
+          .timeline-node {
+            width: 100%;
+            padding-left: 70px;
+            padding-right: var(--space-4);
+          }
+          .timeline-node.left, .timeline-node.right {
+            left: 0;
+          }
+          .timeline-node.left .timeline-dot, .timeline-node.right .timeline-dot {
+            left: 19px;
+          }
+        }
+      </style>
+
       <div class="section-header reveal">
         <h2 id="timeline-title">${t('timeline.title')}</h2>
         <p>${t('timeline.subtitle')}</p>
       </div>
 
-      <div class="timeline-chart-wrap reveal">
-        <div id="timeline-chart" role="img" aria-label="Interactive timeline of the 2024 Indian General Election showing all phases from announcement to results">
-          <p style="text-align:center;padding:2rem;color:var(--text-muted);">Loading timeline...</p>
-        </div>
-      </div>
-
-      <div class="timeline-legend reveal">
+      <div class="timeline-legend reveal" style="display:flex; justify-content:center; gap:var(--space-4); margin-bottom:var(--space-8); flex-wrap:wrap;">
         ${timelineCategories.map(cat => `
-          <div class="timeline-legend-item">
-            <span class="timeline-legend-dot" style="background:${cat.color}" aria-hidden="true"></span>
-            <span>${localize(cat.label)}</span>
+          <div class="timeline-legend-item" style="display:flex; align-items:center; gap:var(--space-2);">
+            <span class="timeline-legend-dot" style="background:${cat.color}; width:12px; height:12px; border-radius:50%;" aria-hidden="true"></span>
+            <span style="font-size:var(--text-sm); color:var(--text-secondary);">${localize(cat.label)}</span>
           </div>
         `).join('')}
       </div>
 
-      <div class="timeline-details reveal" style="margin-top:var(--space-6);">
-        <div class="glass-card" style="padding:var(--space-6);">
-          <h3 style="margin-bottom:var(--space-4);font-size:var(--text-xl);">📅 Phase Details</h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);">
-            ${timelineEvents.map(e => {
-              const cat = timelineCategories.find(c => c.id === e.category);
-              const catLabel = cat ? localize(cat.label) : e.category;
-              return `
-              <div style="padding:var(--space-3);border-left:3px solid ${e.color};background:var(--bg-glass);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
-                <span class="badge badge-info" style="background:${e.color}22;color:${e.color};border-color:${e.color}55;margin-bottom:var(--space-2);">${catLabel}</span>
-                <div style="font-weight:700;color:var(--text-primary);font-size:var(--text-sm);margin-top:var(--space-1);">${localize(e.label)}</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px;">${formatDate(e.startDate)}</div>
-                <div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:4px;">${localize(e.description)}</div>
-              </div>
-            `; }).join('')}
+      <div class="custom-timeline">
+        ${timelineEvents.map((e, i) => {
+          const isLeft = i % 2 === 0;
+          const cat = timelineCategories.find(c => c.id === e.category);
+          const catLabel = cat ? localize(cat.label) : e.category;
+          
+          let dateStr = formatDate(e.startDate);
+          if (e.endDate && e.startDate !== e.endDate) {
+            dateStr += \` — \${formatDate(e.endDate)}\`;
+          }
+
+          return \`
+          <div class="timeline-node \${isLeft ? 'left' : 'right'} reveal delay-\${(i % 5) + 1}">
+            <div class="timeline-dot" style="border-color: \${e.color}; box-shadow: 0 0 15px \${e.color}80;"></div>
+            <div class="timeline-content" style="border-top: 4px solid \${e.color}">
+              <span class="badge" style="background:\${e.color}22; color:\${e.color}; border:1px solid \${e.color}55; position:absolute; top:var(--space-4); right:var(--space-4);">\${catLabel}</span>
+              <div class="timeline-date" style="color: \${e.color};">\${dateStr}</div>
+              <div class="timeline-event-title">\${localize(e.label)}</div>
+              <div class="timeline-desc">\${localize(e.description)}</div>
+            </div>
           </div>
-        </div>
+          \`;
+        }).join('')}
       </div>
     `;
-
-    // Load Google Charts
-    loadChart();
   };
 
   render();
   return { rerender: render };
-}
-
-/** Initialize and draw the Google Charts timeline */
-function loadChart() {
-  const chartEl = document.getElementById('timeline-chart');
-  if (!chartEl) return;
-
-  const initCharts = () => {
-    try {
-      google.charts.load('current', { packages: ['timeline'] });
-      google.charts.setOnLoadCallback(() => {
-        if (google.visualization && google.visualization.Timeline) {
-          drawTimeline();
-        } else {
-          chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Failed to initialize timeline visualization.</p>';
-        }
-      });
-    } catch (e) {
-      chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Error loading Google Charts.</p>';
-    }
-  };
-
-  // If already loaded
-  if (typeof google !== 'undefined' && google.charts) {
-    initCharts();
-    return;
-  }
-
-  // Otherwise, load script dynamically
-  const script = document.createElement('script');
-  script.src = 'https://www.gstatic.com/charts/loader.js';
-  script.onload = initCharts;
-  script.onerror = () => {
-    chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Timeline requires Google Charts (check internet connection).</p>';
-  };
-  document.head.appendChild(script);
-}
-
-/** Draw the timeline chart */
-function drawTimeline() {
-  const chartEl = document.getElementById('timeline-chart');
-  if (!chartEl) { return; }
-
-  const chart = new google.visualization.Timeline(chartEl);
-  const dataTable = new google.visualization.DataTable();
-
-  dataTable.addColumn({ type: 'string', id: 'Category' });
-  dataTable.addColumn({ type: 'string', id: 'Label' });
-  dataTable.addColumn({ type: 'string', role: 'tooltip' });
-  dataTable.addColumn({ type: 'date', id: 'Start' });
-  dataTable.addColumn({ type: 'date', id: 'End' });
-
-  timelineEvents.forEach(event => {
-    const cat = timelineCategories.find(c => c.id === event.category);
-    const catLabel = cat ? localize(cat.label) : event.category;
-    const label = localize(event.label);
-    const desc = localize(event.description);
-    const start = new Date(event.startDate);
-    // For single-day events, show at least 1 day span
-    let end = new Date(event.endDate);
-    if (start.getTime() === end.getTime()) {
-      end = new Date(start.getTime() + 86400000);
-    }
-    const tooltip = `${label}\n${formatDate(event.startDate)}\n${desc}`;
-    dataTable.addRow([catLabel, label, tooltip, start, end]);
-  });
-
-  const options = {
-    timeline: {
-      groupByRowLabel: true,
-      showRowLabels: true,
-      rowLabelStyle: { fontName: 'Inter', fontSize: 13, color: '#A0A0B8' },
-      barLabelStyle: { fontName: 'Inter', fontSize: 11 }
-    },
-    backgroundColor: 'transparent',
-    colors: timelineEvents.map(e => e.color),
-    avoidOverlappingGridLines: true,
-    height: 400
-  };
-
-  chart.draw(dataTable, options);
-
-  // Resize handler
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => chart.draw(dataTable, options), 250);
-  });
 }
 
 /**
