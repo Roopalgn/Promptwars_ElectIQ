@@ -189,21 +189,26 @@ function renderHero() {
   const hero = document.getElementById('hero');
   hero.innerHTML = `
     <div class="hero-content">
-      <div class="hero-badge animate-fade-in-down">
+      <div class="homepage-logo animate-fade-in-down">
+        <span class="logo-icon" aria-hidden="true">🗳️</span>
+        <span class="logo-text">Elect<span>IQ</span></span>
+      </div>
+
+      <div class="hero-badge animate-fade-in-down delay-1">
         <span class="badge badge-primary">✨ ${t('hero.badge')}</span>
       </div>
 
-      <h1 class="hero-title animate-fade-in-up delay-1" id="hero-title">
+      <h1 class="hero-title animate-fade-in-up delay-2" id="hero-title">
         ${t('hero.title.1')}<br>
         <span class="highlight gradient-text-animated">${t('hero.title.2')}</span><br>
         ${t('hero.title.3')}
       </h1>
 
-      <p class="hero-subtitle animate-fade-in-up delay-2">
+      <p class="hero-subtitle animate-fade-in-up delay-3">
         ${t('hero.subtitle')}
       </p>
 
-      <div class="hero-actions animate-fade-in-up delay-3">
+      <div class="hero-actions animate-fade-in-up delay-4">
         <a href="#journey" class="btn btn-primary" id="hero-cta-journey">
           📍 ${t('hero.cta.journey')}
         </a>
