@@ -52,12 +52,12 @@ export function renderMaps(container) {
         <div class="maps-container">
           <iframe
             class="maps-iframe"
-            src="https://maps.google.com/maps?q=Nirvachan+Sadan+Election+Commission+of+India+New+Delhi&output=embed&z=5"
+            src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d14500000!2d75.0!3d22.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sElection+Commission+offices+India!5e0!3m2!1sen!2sin"
             allowfullscreen
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
-            title="Map showing Election Commission of India headquarters, New Delhi"
-            aria-label="Interactive Google Map centered on India showing ECI office locations">
+            title="Map showing Election Commission offices across India"
+            aria-label="Interactive Google Map showing ECI office locations across India">
           </iframe>
         </div>
 

@@ -8,7 +8,7 @@ import { getOfflineAnswer, GENERIC_FALLBACK } from './offline-knowledge.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 /** Models to try in order — falls back to a stable model if newer is unavailable */
-const MODELS = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.0-pro'];
+const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 const MAX_INPUT_LENGTH = 500;
 const MAX_REQUESTS_PER_MIN = 10;
 const RETRY_DELAYS = [1000, 2000, 4000];

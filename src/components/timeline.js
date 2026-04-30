@@ -62,39 +62,39 @@ export function renderTimeline(container) {
 }
 
 /** Initialize and draw the Google Charts timeline */
-function loadChart(retries = 0) {
+function loadChart() {
   const chartEl = document.getElementById('timeline-chart');
-  if (!chartEl) { return; }
+  if (!chartEl) return;
 
-  // Wait for the Google Charts loader script to be available
-  if (typeof google === 'undefined' || typeof google.charts === 'undefined') {
-    if (retries < 40) {
-      setTimeout(() => loadChart(retries + 1), 250);
-      return;
+  const initCharts = () => {
+    try {
+      google.charts.load('current', { packages: ['timeline'] });
+      google.charts.setOnLoadCallback(() => {
+        if (google.visualization && google.visualization.Timeline) {
+          drawTimeline();
+        } else {
+          chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Failed to initialize timeline visualization.</p>';
+        }
+      });
+    } catch (e) {
+      chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Error loading Google Charts.</p>';
     }
-    // Fallback: show the static phase cards instead
+  };
+
+  // If already loaded
+  if (typeof google !== 'undefined' && google.charts) {
+    initCharts();
+    return;
+  }
+
+  // Otherwise, load script dynamically
+  const script = document.createElement('script');
+  script.src = 'https://www.gstatic.com/charts/loader.js';
+  script.onload = initCharts;
+  script.onerror = () => {
     chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Timeline requires Google Charts (check internet connection).</p>';
-    return;
-  }
-
-  // Charts already fully loaded — draw immediately
-  if (google.visualization && google.visualization.Timeline) {
-    drawTimeline();
-    return;
-  }
-
-  // Load the timeline package and draw on callback
-  try {
-    google.charts.load('current', { packages: ['timeline'] });
-    google.charts.setOnLoadCallback(() => {
-      // Extra safety: confirm Timeline is actually available
-      if (google.visualization && google.visualization.Timeline) {
-        drawTimeline();
-      }
-    });
-  } catch (e) {
-    chartEl.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-muted);">Unable to load Google Charts. Please refresh the page.</p>';
-  }
+  };
+  document.head.appendChild(script);
 }
 
 /** Draw the timeline chart */
