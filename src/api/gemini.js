@@ -133,7 +133,7 @@ export async function askGemini(userMessage, history = []) {
       temperature: 0.7,
       topP: 0.9,
       topK: 40,
-      maxOutputTokens: 512
+      maxOutputTokens: 2048
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },

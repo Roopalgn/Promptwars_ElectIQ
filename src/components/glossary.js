@@ -15,6 +15,7 @@ export function renderGlossary(container) {
   let searchQuery = '';
   let activeLetter = '';
   let debounceTimer = null;
+  let isExpanded = false;
 
   const render = () => {
     const filtered = filterTerms(searchQuery, activeLetter);
@@ -47,7 +48,7 @@ export function renderGlossary(container) {
       </div>
 
       <div class="glossary-grid reveal" role="list" aria-label="Election terms">
-        ${filtered.length > 0 ? filtered.map(term => `
+        ${filtered.length > 0 ? (isExpanded || searchQuery || activeLetter ? filtered : filtered.slice(0, 6)).map(term => `
           <div class="glass-card glossary-card hover-lift" role="listitem">
             <div class="glossary-term">${highlightMatch(term.term, searchQuery)}</div>
             ${getLang() === 'hi' || term.hi ? `<div class="glossary-term-hi">${term.hi}</div>` : ''}
@@ -60,6 +61,12 @@ export function renderGlossary(container) {
           </div>
         `}
       </div>
+      
+      ${filtered.length > 6 && !isExpanded && !searchQuery && !activeLetter ? `
+        <div style="text-align:center; margin-top:var(--space-6);" class="reveal">
+          <button class="btn btn-secondary" id="glossary-expand-btn">Read More Definitions ↓</button>
+        </div>
+      ` : ''}
     `;
 
     // Search input with debounce
@@ -89,6 +96,15 @@ export function renderGlossary(container) {
         render();
       });
     });
+
+    // Expand button
+    const expandBtn = container.querySelector('#glossary-expand-btn');
+    if (expandBtn) {
+      expandBtn.addEventListener('click', () => {
+        isExpanded = true;
+        render();
+      });
+    }
   };
 
   render();

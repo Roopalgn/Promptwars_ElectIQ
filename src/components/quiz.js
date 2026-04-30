@@ -146,7 +146,7 @@ export function renderQuiz(container) {
           </div>
 
           <!-- BACK: explanation + next button -->
-          <div class="quiz-flip-face quiz-flip-back glass-card quiz-card ${isCorrect ? 'face-correct' : 'face-incorrect'}" aria-hidden="${!s.answered}">
+          <div class="quiz-flip-face quiz-flip-back glass-card quiz-card ${isCorrect === true ? 'face-correct' : isCorrect === false ? 'face-incorrect' : ''}" aria-hidden="${!s.answered}">
             <div class="quiz-flip-back-icon" aria-hidden="true">${isCorrect ? '✅' : '❌'}</div>
             <h3 class="quiz-flip-back-title">${isCorrect ? t('quiz.correct') : t('quiz.incorrect')}</h3>
             <p class="quiz-flip-back-correct-answer">
@@ -204,13 +204,9 @@ export function renderQuiz(container) {
     container.querySelectorAll('.quiz-answer-btn:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
         const answer = btn.dataset.answer === 'true';
-        // Brief feedback flash before flipping
-        btn.classList.add(state.getCurrentQuestion().answer === answer ? 'correct' : 'incorrect');
-        setTimeout(() => {
-          state.answer(answer);
-          trackEvent('quiz_answer', { question: state.currentIndex + 1, correct: state.getCurrentQuestion().answer === answer });
-          render();
-        }, 350);
+        state.answer(answer);
+        trackEvent('quiz_answer', { question: state.currentIndex + 1, correct: state.getCurrentQuestion().answer === answer });
+        render(); // Immediately render with answered=true to trigger flip
       });
     });
 
