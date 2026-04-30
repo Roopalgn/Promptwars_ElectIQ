@@ -45,8 +45,9 @@ function init() {
   // Spotlight hover effect on glass cards
   initCardSpotlight();
 
-  // Render Hero
+  // Render Home UI
   renderHero();
+  renderFeatureGrid();
 
   // Render all components with error isolation
   components.header = safeRender('app-header', (el) => renderHeader(el, handleLangChange));
@@ -101,18 +102,27 @@ function safeRender(containerId, renderFn) {
  * Hides non-active sections to simulate separate pages.
  */
 function initRouter() {
-  const sections = ['hero', 'quick-links', 'countdown', 'journey', 'timeline', 'eligibility', 'checklist', 'evm', 'quiz', 'pledge', 'glossary', 'maps'];
+  const sections = ['hero', 'feature-grid', 'countdown', 'journey', 'timeline', 'eligibility', 'checklist', 'evm', 'quiz', 'pledge', 'glossary', 'maps'];
   
   function handleRoute() {
     const hash = window.location.hash.slice(1) || 'hero';
     const isHome = hash === 'hero' || hash === '';
+
+    const header = document.getElementById('app-header');
+    if (header) {
+      if (isHome) {
+        header.classList.add('header-hidden');
+      } else {
+        header.classList.remove('header-hidden');
+      }
+    }
 
     sections.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       
       if (isHome) {
-        if (id === 'hero' || id === 'quick-links' || id === 'countdown') {
+        if (id === 'hero' || id === 'feature-grid' || id === 'countdown') {
           el.style.display = 'block';
         } else {
           el.style.display = 'none';
@@ -175,9 +185,6 @@ function initCardSpotlight() {
   }, { passive: true });
 }
 
-/**
- * Render the Hero section
- */
 function renderHero() {
   const hero = document.getElementById('hero');
   hero.innerHTML = `
@@ -204,21 +211,6 @@ function renderHero() {
           💬 ${t('hero.cta.chat')}
         </button>
       </div>
-
-      <div class="hero-stats animate-fade-in-up delay-4">
-        <div class="hero-stat">
-          <div class="hero-stat-value">${t('hero.stat.voters')}</div>
-          <div class="hero-stat-label">${t('hero.stat.voters.label')}</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">${t('hero.stat.constituencies')}</div>
-          <div class="hero-stat-label">${t('hero.stat.constituencies.label')}</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">${t('hero.stat.phases')}</div>
-          <div class="hero-stat-label">${t('hero.stat.phases.label')}</div>
-        </div>
-      </div>
     </div>
   `;
 
@@ -230,6 +222,35 @@ function renderHero() {
       if (toggle) { toggle.click(); }
     });
   }
+}
+
+/**
+ * Render the Dashboard Style Feature Grid
+ */
+function renderFeatureGrid() {
+  const grid = document.getElementById('feature-grid');
+  if (!grid) return;
+
+  const features = [
+    { id: 'journey', icon: '📍', title: t('nav.journey'), desc: 'Step-by-step guide from registration to results.' },
+    { id: 'timeline', icon: '📅', title: t('nav.timeline'), desc: 'Explore all the important election phases.' },
+    { id: 'eligibility', icon: '✅', title: t('nav.eligibility'), desc: 'Check if you are eligible to vote.' },
+    { id: 'evm', icon: '🗳️', title: t('nav.evm'), desc: 'Try our interactive EVM simulator.' },
+    { id: 'quiz', icon: '🧠', title: t('nav.quiz'), desc: 'Test your election knowledge.' },
+    { id: 'pledge', icon: '🤝', title: t('nav.pledge'), desc: 'Take the voter pledge today.' }
+  ];
+
+  grid.innerHTML = `
+    <div class="feature-dashboard-grid">
+      ${features.map((f, i) => `
+        <a href="#${f.id}" class="dashboard-card glass-card animate-fade-in-up delay-${(i % 3) + 1}">
+          <div class="dashboard-card-icon">${f.icon}</div>
+          <h3 class="dashboard-card-title">${f.title}</h3>
+          <p class="dashboard-card-desc">${f.desc}</p>
+        </a>
+      `).join('')}
+    </div>
+  `;
 }
 
 /**
