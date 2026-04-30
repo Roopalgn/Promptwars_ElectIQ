@@ -138,6 +138,14 @@ const translations = {
     'pledge.share': 'Share Pledge',
     'pledge.retake': 'Retake Pledge',
     'pledge.confirmReset': 'This will erase your saved pledge. Continue?',
+    
+    'checklist.title': 'Polling Day Checklist',
+    'checklist.subtitle': 'Make sure you have everything ready before you head to the polling booth.',
+    'checklist.item.1': 'Voter Slip (Optional, but helps find your room quickly)',
+    'checklist.item.2': 'Valid Original Photo ID (e.g. Voter ID, Aadhaar, PAN, Passport)',
+    'checklist.item.3': 'Verify your name is on the Electoral Roll',
+    'checklist.item.4': 'Leave mobile phones and smartwatches at home or outside the booth',
+    'checklist.completed': 'You are ready to vote!',
 
     'quiz.copied': 'Copied!',
     'lang.toggle': 'हिंदी'
@@ -274,6 +282,14 @@ const translations = {
     'pledge.share': 'शपथ साझा करें',
     'pledge.retake': 'पुनः शपथ लें',
     'pledge.confirmReset': 'यह आपकी सहेजी गई शपथ मिटा देगा। जारी रखें?',
+
+    'checklist.title': 'मतदान दिवस चेकलिस्ट',
+    'checklist.subtitle': 'मतदान केंद्र जाने से पहले सुनिश्चित करें कि आपके पास सब कुछ है।',
+    'checklist.item.1': 'वोटर स्लिप (वैकल्पिक, लेकिन कमरा जल्दी खोजने में मदद करता है)',
+    'checklist.item.2': 'मूल फोटो आईडी (जैसे वोटर आईडी, आधार, पैन, पासपोर्ट)',
+    'checklist.item.3': 'सत्यापित करें कि आपका नाम मतदाता सूची में है',
+    'checklist.item.4': 'मोबाइल फोन और स्मार्टवॉच घर पर या बूथ के बाहर छोड़ दें',
+    'checklist.completed': 'आप वोट देने के लिए तैयार हैं!',
 
     'quiz.copied': 'कॉपी हो गया!',
     'lang.toggle': 'English'

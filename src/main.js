@@ -20,6 +20,7 @@ import { renderChatbot } from './components/chatbot.js';
 import { renderCountdown } from './components/countdown.js';
 import { renderEligibility } from './components/eligibility.js';
 import { renderEvmSimulator } from './components/evm-simulator.js';
+import { renderChecklist } from './components/checklist.js';
 import { renderPledge } from './components/pledge.js';
 import { t, getLang } from './utils/i18n.js';
 import { initAnalytics } from './utils/analytics.js';
@@ -53,6 +54,7 @@ function init() {
   components.journey = safeRender('journey', renderJourneyMap);
   components.timeline = safeRender('timeline', renderTimeline);
   components.eligibility = safeRender('eligibility', renderEligibility);
+  components.checklist = safeRender('checklist', renderChecklist);
   components.evm = safeRender('evm', renderEvmSimulator);
   components.quiz = safeRender('quiz', renderQuiz);
   components.pledge = safeRender('pledge', renderPledge);
