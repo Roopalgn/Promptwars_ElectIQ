@@ -118,41 +118,53 @@ export function renderQuiz(container) {
         <div class="quiz-progress-fill" style="width:${progress}%"></div>
       </div>
 
-      <div class="glass-card quiz-card animate-fade-in-up">
-        <div class="quiz-question-num">${t('quiz.question')} ${s.currentIndex + 1} / ${s.questions.length}</div>
-        <p class="quiz-question">"${q.question}"</p>
-        <span class="badge badge-info quiz-category">${q.category}</span>
+      <div class="quiz-flip-stage" id="quiz-flip-stage">
+        <div class="quiz-flip-card ${s.answered ? 'flipped' : ''}" id="quiz-flip-card">
 
-        <div class="quiz-answers">
-          <button class="quiz-answer-btn true-btn ${s.answered && s.selectedAnswer === true ? (isCorrect ? 'correct' : 'incorrect') : ''} ${s.answered && q.answer === true && s.selectedAnswer !== true ? 'correct' : ''}"
-                  id="quiz-true-btn"
-                  data-answer="true"
-                  ${s.answered ? 'disabled' : ''}
-                  aria-label="True">
-            ${t('quiz.true')}
-          </button>
-          <button class="quiz-answer-btn false-btn ${s.answered && s.selectedAnswer === false ? (isCorrect ? 'correct' : 'incorrect') : ''} ${s.answered && q.answer === false && s.selectedAnswer !== false ? 'correct' : ''}"
-                  id="quiz-false-btn"
-                  data-answer="false"
-                  ${s.answered ? 'disabled' : ''}
-                  aria-label="False">
-            ${t('quiz.false')}
-          </button>
-        </div>
+          <!-- FRONT: question + answer buttons -->
+          <div class="quiz-flip-face quiz-flip-front glass-card quiz-card">
+            <div class="quiz-question-num">${t('quiz.question')} ${s.currentIndex + 1} / ${s.questions.length}</div>
+            <p class="quiz-question">"${q.question}"</p>
+            <span class="badge badge-info quiz-category">${q.category}</span>
 
-        ${s.answered ? `
-          <div class="quiz-explanation ${isCorrect ? 'correct-exp' : 'incorrect-exp'}" role="alert">
-            <p><strong>${isCorrect ? t('quiz.correct') : t('quiz.incorrect')}</strong></p>
-            <p>${q.explanation}</p>
+            <div class="quiz-answers">
+              <button class="quiz-answer-btn true-btn"
+                      id="quiz-true-btn"
+                      data-answer="true"
+                      ${s.answered ? 'disabled' : ''}
+                      aria-label="True">
+                ${t('quiz.true')}
+              </button>
+              <button class="quiz-answer-btn false-btn"
+                      id="quiz-false-btn"
+                      data-answer="false"
+                      ${s.answered ? 'disabled' : ''}
+                      aria-label="False">
+                ${t('quiz.false')}
+              </button>
+            </div>
           </div>
-          <button class="btn btn-primary" id="quiz-next-btn" style="margin-top:var(--space-4);">
-            ${s.currentIndex < s.questions.length - 1 ? t('quiz.next') : `${t('quiz.score')} →`}
-          </button>
-        ` : ''}
+
+          <!-- BACK: explanation + next button -->
+          <div class="quiz-flip-face quiz-flip-back glass-card quiz-card ${isCorrect ? 'face-correct' : 'face-incorrect'}" aria-hidden="${!s.answered}">
+            <div class="quiz-flip-back-icon" aria-hidden="true">${isCorrect ? '✅' : '❌'}</div>
+            <h3 class="quiz-flip-back-title">${isCorrect ? t('quiz.correct') : t('quiz.incorrect')}</h3>
+            <p class="quiz-flip-back-correct-answer">
+              <strong>${t('quiz.true')}/${t('quiz.false')}:</strong> ${q.answer ? t('quiz.true') : t('quiz.false')}
+            </p>
+            <p class="quiz-flip-back-explanation">${q.explanation}</p>
+            ${s.answered ? `
+              <button class="btn btn-primary quiz-next-action" id="quiz-next-btn">
+                ${s.currentIndex < s.questions.length - 1 ? t('quiz.next') : `${t('quiz.score')} →`}
+              </button>
+            ` : ''}
+          </div>
+
+        </div>
       </div>
 
-      <div style="text-align:center;margin-top:var(--space-4);color:var(--text-muted);font-size:var(--text-sm);">
-        Score: ${s.score}/${s.currentIndex + (s.answered ? 1 : 0)}
+      <div class="quiz-score-live" aria-live="polite">
+        ${t('quiz.score')}: <strong>${s.score}</strong> / ${s.currentIndex + (s.answered ? 1 : 0)}
       </div>
     `;
   }
@@ -192,15 +204,29 @@ export function renderQuiz(container) {
     container.querySelectorAll('.quiz-answer-btn:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
         const answer = btn.dataset.answer === 'true';
-        state.answer(answer);
-        trackEvent('quiz_answer', { question: state.currentIndex + 1, correct: state.getCurrentQuestion().answer === answer });
-        render();
+        // Brief feedback flash before flipping
+        btn.classList.add(state.getCurrentQuestion().answer === answer ? 'correct' : 'incorrect');
+        setTimeout(() => {
+          state.answer(answer);
+          trackEvent('quiz_answer', { question: state.currentIndex + 1, correct: state.getCurrentQuestion().answer === answer });
+          render();
+        }, 350);
       });
     });
 
     const nextBtn = container.querySelector('#quiz-next-btn');
     if (nextBtn) {
-      nextBtn.addEventListener('click', () => { state.next(); render(); });
+      nextBtn.addEventListener('click', () => {
+        const stage = container.querySelector('#quiz-flip-stage');
+        if (stage && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          // Slide out the current card, then advance and slide the next in
+          stage.classList.add('slide-out');
+          setTimeout(() => { state.next(); render(); }, 280);
+        } else {
+          state.next();
+          render();
+        }
+      });
     }
 
     const retryBtn = container.querySelector('#quiz-retry-btn');

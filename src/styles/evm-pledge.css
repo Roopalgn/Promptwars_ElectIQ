@@ -1,0 +1,338 @@
+/* ==========================================================================
+   EVM Simulator + Voter Pledge styles
+   ========================================================================== */
+
+/* --- EVM Simulator --- */
+.evm-wrap { max-width: 720px; margin: 0 auto; }
+.evm-intro { padding: var(--space-8); text-align: center; }
+.evm-icon-large { font-size: 4rem; margin-bottom: var(--space-4); }
+.evm-rules {
+  list-style: none; padding: 0; margin: var(--space-6) auto;
+  max-width: 480px; text-align: left;
+}
+.evm-rules li {
+  padding: var(--space-2) 0 var(--space-2) var(--space-6);
+  position: relative; color: var(--text-secondary); font-size: var(--text-sm);
+}
+.evm-rules li::before {
+  content: '•'; position: absolute; left: var(--space-2);
+  color: var(--color-primary); font-size: 1.5rem; line-height: 1;
+}
+
+.evm-machine {
+  padding: var(--space-6);
+  background: linear-gradient(180deg, #1a2238 0%, #0F1722 100%);
+  border: 2px solid #2a3554;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.evm-display {
+  background: #0a0f18; border: 2px solid #2a3554;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex; align-items: center; gap: var(--space-3);
+  font-family: monospace; color: #34D399;
+  letter-spacing: 1px; margin-bottom: var(--space-4);
+}
+.evm-display-led {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #34D399; box-shadow: 0 0 8px #34D399;
+  animation: pulse-green 2s infinite;
+}
+.evm-instruction {
+  text-align: center; color: var(--text-secondary);
+  font-size: var(--text-sm); margin-bottom: var(--space-4);
+  font-style: italic;
+}
+
+.evm-ballot { display: flex; flex-direction: column; gap: var(--space-2); }
+.evm-row {
+  display: grid; grid-template-columns: 40px 1fr auto 80px;
+  align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer; text-align: left;
+  transition: all var(--transition-base);
+  font-family: var(--font-body); color: var(--text-primary);
+}
+.evm-row:not(:disabled):hover {
+  background: rgba(255,107,53,0.1);
+  border-color: var(--color-primary);
+  transform: translateX(4px);
+}
+.evm-row:disabled { cursor: not-allowed; opacity: 0.55; }
+.evm-row.pressed {
+  background: rgba(22,163,74,0.18);
+  border-color: var(--color-accent);
+  animation: pulse-green 0.6s ease-out;
+}
+.evm-row-num {
+  font-family: monospace; font-size: var(--text-lg);
+  font-weight: 700; color: var(--text-muted);
+}
+.evm-row-info { display: flex; flex-direction: column; gap: 2px; }
+.evm-row-name { font-weight: 700; }
+.evm-row-party { font-size: var(--text-sm); }
+.evm-row-symbol { font-size: 1.8rem; }
+.evm-row-button {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: var(--space-2);
+}
+.evm-row-led {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #444; transition: all var(--transition-base);
+}
+.evm-row-led.on {
+  background: #16A34A; box-shadow: 0 0 12px #16A34A;
+  animation: led-blink 0.4s ease-in-out 3;
+}
+@keyframes led-blink {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+.evm-row-key {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #4a5470, #2a3554);
+  border: 1px solid #5a6480;
+  border-radius: 50%;
+  color: #1a2238; font-size: 0.7rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.evm-row:not(:disabled):hover .evm-row-key {
+  background: linear-gradient(180deg, #FF8F66, #E5551F);
+  color: white;
+}
+.evm-footer {
+  margin-top: var(--space-5); padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  text-align: center; font-family: var(--font-display);
+}
+.evm-brand {
+  display: block; font-size: var(--text-xs);
+  color: var(--text-muted); letter-spacing: 2px;
+}
+.evm-brand-en {
+  display: block; font-size: var(--text-xs);
+  color: var(--text-muted); letter-spacing: 1px; margin-top: 2px;
+}
+
+/* VVPAT slip */
+.vvpat-stage { padding: var(--space-6); text-align: center; }
+.vvpat-caption { color: var(--text-secondary); margin-bottom: var(--space-5); }
+.vvpat-window {
+  background: #1a1410; border: 3px solid #3a2a1a;
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0 auto var(--space-4); max-width: 400px;
+  min-height: 140px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.6);
+}
+.vvpat-slip {
+  background: #FFFEF7; color: #1a1a1a;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 4px;
+  font-family: monospace;
+  width: 100%; max-width: 320px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.animate-slip-in {
+  animation: slip-print 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: top center;
+}
+@keyframes slip-print {
+  0%   { transform: translateY(-120%) scaleY(0.1); opacity: 0; }
+  60%  { transform: translateY(0) scaleY(1); opacity: 1; }
+  75%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+.vvpat-slip-header {
+  font-weight: 700; font-size: var(--text-xs);
+  letter-spacing: 3px; text-align: center;
+  border-bottom: 1px dashed #888;
+  padding-bottom: var(--space-2); margin-bottom: var(--space-2);
+}
+.vvpat-slip-row {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+.vvpat-slip-num { font-weight: 700; }
+.vvpat-slip-name { flex: 1; font-weight: 700; }
+.vvpat-slip-symbol { font-size: 1.5rem; }
+.vvpat-slip-meta {
+  font-size: var(--text-xs); text-align: center;
+  border-top: 1px dashed #888; padding-top: var(--space-2);
+  margin-top: var(--space-2); color: #555;
+}
+.vvpat-countdown {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  background: rgba(255,107,53,0.12);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-3);
+}
+.vvpat-countdown strong {
+  color: var(--color-primary-light);
+  font-size: var(--text-lg);
+  font-family: monospace;
+}
+.vvpat-disclaimer {
+  font-size: var(--text-xs); color: var(--text-muted);
+  font-style: italic; max-width: 480px; margin: 0 auto;
+}
+
+.evm-done { padding: var(--space-8); text-align: center; }
+.evm-recap {
+  list-style: none; padding: 0; margin: var(--space-5) auto;
+  max-width: 400px; text-align: left;
+}
+.evm-recap li {
+  padding: var(--space-2) 0;
+  color: var(--text-secondary);
+}
+.evm-actions {
+  display: flex; gap: var(--space-3); justify-content: center;
+  flex-wrap: wrap; margin-top: var(--space-5);
+}
+
+@media (max-width: 600px) {
+  .evm-row {
+    grid-template-columns: 32px 1fr 60px;
+  }
+  .evm-row-button { display: none; }
+  .evm-row-symbol { font-size: 1.5rem; }
+}
+
+/* --- Voter Pledge --- */
+.pledge-form { padding: var(--space-6) var(--space-8); max-width: 600px; margin: 0 auto; }
+.pledge-intro { color: var(--text-secondary); margin-bottom: var(--space-4); }
+.pledge-statements {
+  list-style: none; padding: 0; margin-bottom: var(--space-6);
+  background: rgba(26,86,219,0.08);
+  border-left: 3px solid var(--color-secondary-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+.pledge-statements li {
+  padding: var(--space-2) 0 var(--space-2) var(--space-6);
+  position: relative; color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+.pledge-statements li::before {
+  content: '✓'; position: absolute; left: 0;
+  color: var(--color-accent-light); font-weight: 700;
+}
+
+.pledge-certificate-wrap { max-width: 800px; margin: 0 auto; }
+.pledge-certificate {
+  padding: 0; border-radius: var(--radius-lg); overflow: hidden;
+  background: linear-gradient(135deg, #0F0F1A 0%, #161625 100%);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: cert-stamp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes cert-stamp {
+  0%   { transform: scale(0.6) rotate(-3deg); opacity: 0; }
+  60%  { transform: scale(1.05) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+.pledge-cert-border {
+  position: relative;
+  padding: var(--space-8) var(--space-10);
+  border: 6px solid;
+  border-image: linear-gradient(90deg, var(--color-primary), var(--color-secondary-light), var(--color-accent)) 1;
+  margin: 12px;
+  border-radius: var(--radius-md);
+}
+.pledge-cert-header {
+  display: flex; align-items: center; gap: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--space-4); margin-bottom: var(--space-5);
+}
+.pledge-cert-emblem { font-size: 3rem; }
+.pledge-cert-eyebrow {
+  font-size: var(--text-xs); letter-spacing: 4px;
+  color: var(--color-primary-light); text-transform: uppercase;
+}
+.pledge-cert-title {
+  font-family: var(--font-display); font-size: var(--text-2xl);
+  margin-top: var(--space-1); color: var(--text-primary);
+}
+.pledge-cert-body { color: var(--text-secondary); margin-bottom: var(--space-2); }
+.pledge-cert-name {
+  font-family: var(--font-display);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: var(--text-4xl); margin-bottom: var(--space-2);
+  word-break: break-word;
+}
+.pledge-cert-state { color: var(--text-secondary); margin-bottom: var(--space-5); }
+.pledge-cert-pledge {
+  font-style: italic; font-size: var(--text-lg);
+  color: var(--text-primary); line-height: 1.7;
+  padding: var(--space-4) var(--space-6);
+  border-left: 3px solid var(--color-primary);
+  background: rgba(255,107,53,0.05);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-bottom: var(--space-6);
+}
+.pledge-cert-footer {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-6); align-items: center;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+.pledge-cert-footer > *:first-child { text-align: left; }
+.pledge-cert-footer > *:last-child { text-align: right; }
+.pledge-cert-label {
+  font-size: var(--text-xs); color: var(--text-muted);
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.pledge-cert-value {
+  color: var(--text-primary); font-weight: 700;
+  font-family: var(--font-display);
+}
+.pledge-cert-stamp {
+  width: 90px; height: 90px;
+  border: 3px solid var(--color-primary);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-primary-light); font-weight: 800;
+  font-family: var(--font-display);
+  transform: rotate(-12deg);
+  background: rgba(255,107,53,0.05);
+}
+.pledge-cert-stamp-inner {
+  text-align: center; font-size: var(--text-sm);
+  letter-spacing: 1px; line-height: 1.2;
+}
+.pledge-actions {
+  display: flex; gap: var(--space-3); justify-content: center;
+  flex-wrap: wrap; margin-top: var(--space-6);
+}
+
+@media (max-width: 600px) {
+  .pledge-cert-border { padding: var(--space-5) var(--space-4); margin: 8px; }
+  .pledge-cert-name { font-size: var(--text-2xl); }
+  .pledge-cert-footer { grid-template-columns: 1fr; gap: var(--space-3); text-align: center !important; }
+  .pledge-cert-footer > * { text-align: center !important; }
+}
+
+/* --- Print stylesheet (cheat-sheet & certificate) --- */
+@media print {
+  body::before, header, .chatbot-toggle-btn, #chatbot, footer,
+  .skip-link, .countdown-banner, #evm, #pledge form, .pledge-actions,
+  #quiz, .header-nav, .header-mobile-toggle, .reveal { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .glass-card { background: white !important; border: 1px solid #ccc !important; box-shadow: none !important; backdrop-filter: none !important; }
+  .glass-card::before { display: none !important; }
+  * { color: black !important; }
+  .pledge-cert-name { color: #E5551F !important; -webkit-text-fill-color: #E5551F !important; }
+  a::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #555 !important; }
+}

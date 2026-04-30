@@ -8,6 +8,7 @@
 import './styles/main.css';
 import './styles/components.css';
 import './styles/animations.css';
+import './styles/evm-pledge.css';
 
 import { renderHeader } from './components/header.js';
 import { renderJourneyMap } from './components/journey-map.js';
@@ -18,6 +19,8 @@ import { renderMaps } from './components/maps.js';
 import { renderChatbot } from './components/chatbot.js';
 import { renderCountdown } from './components/countdown.js';
 import { renderEligibility } from './components/eligibility.js';
+import { renderEvmSimulator } from './components/evm-simulator.js';
+import { renderPledge } from './components/pledge.js';
 import { t, getLang } from './utils/i18n.js';
 import { initAnalytics } from './utils/analytics.js';
 import { initPerformanceMonitoring, addResourceHints } from './utils/performance.js';
@@ -38,6 +41,9 @@ function init() {
   initPerformanceMonitoring();
   addResourceHints();
 
+  // Spotlight hover effect on glass cards
+  initCardSpotlight();
+
   // Render Hero
   renderHero();
 
@@ -47,7 +53,9 @@ function init() {
   components.journey = safeRender('journey', renderJourneyMap);
   components.timeline = safeRender('timeline', renderTimeline);
   components.eligibility = safeRender('eligibility', renderEligibility);
+  components.evm = safeRender('evm', renderEvmSimulator);
   components.quiz = safeRender('quiz', renderQuiz);
+  components.pledge = safeRender('pledge', renderPledge);
   components.glossary = safeRender('glossary', renderGlossary);
   components.maps = safeRender('maps', renderMaps);
   components.chatbot = safeRender('chatbot-container', renderChatbot);
@@ -87,22 +95,59 @@ function safeRender(containerId, renderFn) {
 }
 
 /**
- * Manage focus when navigating between sections via hash links
+ * Manage focus when navigating between sections via hash links.
+ * Performs a smooth scroll that accounts for the fixed header,
+ * then moves keyboard focus into the target section for accessibility.
  */
 function initFocusManagement() {
+  const HEADER_OFFSET = 72; // approx. fixed header height
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
-      const targetId = link.getAttribute('href').slice(1);
+      const href = link.getAttribute('href');
+      if (!href || href === '#') return;
+      const targetId = href.slice(1);
       const target = document.getElementById(targetId);
-      if (target) {
-        // Smooth scroll + focus management
-        setTimeout(() => {
-          target.setAttribute('tabindex', '-1');
-          target.focus({ preventScroll: true });
-        }, 400);
-      }
+      if (!target) return;
+
+      e.preventDefault();
+      const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+      window.scrollTo({
+        top,
+        behavior: reduceMotion ? 'auto' : 'smooth'
+      });
+
+      // Move focus once scroll completes (≈500ms for smooth)
+      setTimeout(() => {
+        target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
+        // Pulse the section briefly so the user sees what got focus
+        target.classList.add('section-flash');
+        setTimeout(() => target.classList.remove('section-flash'), 1200);
+      }, reduceMotion ? 0 : 500);
+
+      // Update history without reload
+      try { history.replaceState(null, '', href); } catch { /* noop */ }
     });
   });
+}
+
+/**
+ * Mouse-following spotlight effect for `.glass-card` elements.
+ * Uses a single delegated `pointermove` listener and CSS variables for performance.
+ */
+function initCardSpotlight() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(hover: hover)').matches) return; // skip on touch devices
+
+  document.addEventListener('pointermove', (e) => {
+    const card = e.target.closest && e.target.closest('.glass-card');
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+    card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+  }, { passive: true });
 }
 
 /**

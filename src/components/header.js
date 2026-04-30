@@ -28,7 +28,9 @@ export function renderHeader(container, onLangChange) {
           <a href="#journey" id="nav-journey"><span>📍 </span>${t('nav.journey')}</a>
           <a href="#timeline" id="nav-timeline"><span>📅 </span>${t('nav.timeline')}</a>
           <a href="#eligibility" id="nav-eligibility"><span>✅ </span>${t('nav.eligibility')}</a>
+          <a href="#evm" id="nav-evm"><span>🗳️ </span>${t('nav.evm')}</a>
           <a href="#quiz" id="nav-quiz"><span>🧠 </span>${t('nav.quiz')}</a>
+          <a href="#pledge" id="nav-pledge"><span>🤝 </span>${t('nav.pledge')}</a>
           <a href="#glossary" id="nav-glossary"><span>📖 </span>${t('nav.glossary')}</a>
           <a href="#maps" id="nav-maps"><span>📍 </span>${t('nav.maps')}</a>
           <button class="lang-toggle" id="lang-toggle-btn" aria-label="Switch language">
@@ -85,7 +87,7 @@ export function renderHeader(container, onLangChange) {
 
 /** Update active nav link based on scroll position */
 function updateActiveNav() {
-  const sections = ['journey', 'timeline', 'eligibility', 'quiz', 'glossary', 'maps'];
+  const sections = ['journey', 'timeline', 'eligibility', 'evm', 'quiz', 'pledge', 'glossary', 'maps'];
   const scrollY = window.scrollY + 120;
 
   let activeId = '';
