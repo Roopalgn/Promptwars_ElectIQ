@@ -126,7 +126,7 @@ export const timelineEvents = [
 
 /** Category color legend */
 export const timelineCategories = [
-  { id: 'pre-election', label: { en: 'Pre-Election', hi: 'चुनाव पूर्व' }, color: '#3B82F6' },
+  { id: 'pre-election', label: { en: 'Pre-Election', hi: 'चुनाव पूर्व' }, color: '#8B5CF6' },
   { id: 'election', label: { en: 'Campaign', hi: 'प्रचार' }, color: '#F59E0B' },
   { id: 'polling', label: { en: 'Polling Phases', hi: 'मतदान चरण' }, color: '#FF6B35' },
   { id: 'post-election', label: { en: 'Post-Election', hi: 'चुनाव पश्चात' }, color: '#16A34A' }
