@@ -65,8 +65,8 @@ function init() {
   // Intersection Observer for scroll animations
   initScrollReveal();
 
-  // Focus management for hash navigation
-  initFocusManagement();
+  // SPA Router for hash navigation
+  initRouter();
 
   // Register Service Worker
   registerServiceWorker();
@@ -97,42 +97,65 @@ function safeRender(containerId, renderFn) {
 }
 
 /**
- * Manage focus when navigating between sections via hash links.
- * Performs a smooth scroll that accounts for the fixed header,
- * then moves keyboard focus into the target section for accessibility.
+ * Simple SPA Router based on URL hash.
+ * Hides non-active sections to simulate separate pages.
  */
-function initFocusManagement() {
-  const HEADER_OFFSET = 72; // approx. fixed header height
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function initRouter() {
+  const sections = ['hero', 'quick-links', 'countdown', 'journey', 'timeline', 'eligibility', 'checklist', 'evm', 'quiz', 'pledge', 'glossary', 'maps'];
+  
+  function handleRoute() {
+    const hash = window.location.hash.slice(1) || 'hero';
+    const isHome = hash === 'hero' || hash === '';
 
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      
+      if (isHome) {
+        if (id === 'hero' || id === 'quick-links' || id === 'countdown') {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'none';
+        }
+      } else {
+        if (id === hash) {
+          el.style.display = 'block';
+          // For accessibility, focus the newly visible section
+          setTimeout(() => {
+            el.setAttribute('tabindex', '-1');
+            el.focus({ preventScroll: true });
+            window.scrollTo(0, 0);
+          }, 50);
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    });
+
+    // Highlight active nav link
+    document.querySelectorAll('.header-nav a').forEach(link => {
+      const linkHash = link.getAttribute('href');
+      link.classList.toggle('active', linkHash === `#${hash}` || (isHome && linkHash === '#hero'));
+    });
+  }
+
+  window.addEventListener('hashchange', handleRoute);
+  
+  // Intercept anchor clicks
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
-      const href = link.getAttribute('href');
-      if (!href || href === '#') return;
-      const targetId = href.slice(1);
-      const target = document.getElementById(targetId);
-      if (!target) return;
-
       e.preventDefault();
-      const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-      window.scrollTo({
-        top,
-        behavior: reduceMotion ? 'auto' : 'smooth'
-      });
-
-      // Move focus once scroll completes (≈500ms for smooth)
-      setTimeout(() => {
-        target.setAttribute('tabindex', '-1');
-        target.focus({ preventScroll: true });
-        // Pulse the section briefly so the user sees what got focus
-        target.classList.add('section-flash');
-        setTimeout(() => target.classList.remove('section-flash'), 1200);
-      }, reduceMotion ? 0 : 500);
-
-      // Update history without reload
-      try { history.replaceState(null, '', href); } catch { /* noop */ }
+      const href = link.getAttribute('href');
+      if (window.location.hash === href || (window.location.hash === '' && href === '#hero')) {
+        window.scrollTo(0, 0); // already there, just scroll up
+      } else {
+        window.location.hash = href;
+      }
     });
   });
+
+  // Run on load
+  handleRoute();
 }
 
 /**

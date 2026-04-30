@@ -66,12 +66,9 @@ export function renderHeader(container, onLangChange) {
       }
     });
 
-    // Highlight active nav based on scroll
-    updateActiveNav();
   };
 
   render();
-  window.addEventListener('scroll', updateActiveNav, { passive: true });
 
   // Close menu on Escape key
   document.addEventListener('keydown', (e) => {
@@ -85,20 +82,4 @@ export function renderHeader(container, onLangChange) {
   return { rerender: render };
 }
 
-/** Update active nav link based on scroll position */
-function updateActiveNav() {
-  const sections = ['journey', 'timeline', 'eligibility', 'evm', 'quiz', 'pledge', 'glossary', 'maps'];
-  const scrollY = window.scrollY + 120;
 
-  let activeId = '';
-  for (const id of sections) {
-    const el = document.getElementById(id);
-    if (el && el.offsetTop <= scrollY) {
-      activeId = id;
-    }
-  }
-
-  document.querySelectorAll('.header-nav a').forEach(link => {
-    link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
-  });
-}

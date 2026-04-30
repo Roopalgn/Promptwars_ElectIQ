@@ -139,9 +139,9 @@ a:hover { color:var(--color-primary); text-decoration:underline; }
   min-height:44px; min-width:44px;
 }
 .btn-primary { background:linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color:white; box-shadow:var(--shadow-glow); }
-.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 30px rgba(255,107,53,0.4); }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 30px rgba(255,107,53,0.4); color:white; text-decoration:none; }
 .btn-secondary { background:var(--bg-glass); color:var(--text-primary); border:1px solid var(--border-default); }
-.btn-secondary:hover { background:var(--bg-glass-hover); border-color:var(--color-primary); }
+.btn-secondary:hover { background:var(--bg-glass-hover); border-color:var(--color-primary); color:var(--text-primary); text-decoration:none; }
 .btn-ghost { background:transparent; color:var(--text-secondary); }
 .btn-ghost:hover { color:var(--text-primary); background:var(--bg-glass); }
 .btn:disabled, .btn[disabled] {

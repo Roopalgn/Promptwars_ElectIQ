@@ -146,14 +146,14 @@ export function renderQuiz(container) {
           </div>
 
           <!-- BACK: explanation + next button -->
-          <div class="quiz-flip-face quiz-flip-back glass-card quiz-card ${isCorrect === true ? 'face-correct' : isCorrect === false ? 'face-incorrect' : ''}" aria-hidden="${!s.answered}">
-            <div class="quiz-flip-back-icon" aria-hidden="true">${isCorrect ? '✅' : '❌'}</div>
-            <h3 class="quiz-flip-back-title">${isCorrect ? t('quiz.correct') : t('quiz.incorrect')}</h3>
-            <p class="quiz-flip-back-correct-answer">
-              <strong>${t('quiz.true')}/${t('quiz.false')}:</strong> ${q.answer ? t('quiz.true') : t('quiz.false')}
-            </p>
-            <p class="quiz-flip-back-explanation">${q.explanation}</p>
+          <div class="quiz-flip-face quiz-flip-back glass-card quiz-card ${isCorrect === true ? 'face-correct' : isCorrect === false ? 'face-incorrect' : ''}" aria-hidden="${!s.answered}" style="${!s.answered && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'display: none;' : ''}">
             ${s.answered ? `
+              <div class="quiz-flip-back-icon" aria-hidden="true">${isCorrect === true ? '✅' : '❌'}</div>
+              <h3 class="quiz-flip-back-title">${isCorrect === true ? t('quiz.correct') : t('quiz.incorrect')}</h3>
+              <p class="quiz-flip-back-correct-answer">
+                <strong>${t('quiz.true')}/${t('quiz.false')}:</strong> ${q.answer ? t('quiz.true') : t('quiz.false')}
+              </p>
+              <p class="quiz-flip-back-explanation">${q.explanation}</p>
               <button class="btn btn-primary quiz-next-action" id="quiz-next-btn">
                 ${s.currentIndex < s.questions.length - 1 ? t('quiz.next') : `${t('quiz.score')} →`}
               </button>

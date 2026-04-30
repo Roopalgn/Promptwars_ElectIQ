@@ -144,10 +144,10 @@ export function renderTimeline(container) {
 
           return `
           <div class="timeline-node ${isLeft ? 'left' : 'right'} reveal delay-${(i % 5) + 1}">
-            <div class="timeline-dot" style="border-color: ${e.color}; box-shadow: 0 0 15px ${e.color}80;"></div>
-            <div class="timeline-content" style="border-top: 4px solid ${e.color}">
-              <span class="badge" style="background:${e.color}22; color:${e.color}; border:1px solid ${e.color}55; position:absolute; top:var(--space-4); right:var(--space-4);">${catLabel}</span>
-              <div class="timeline-date" style="color: ${e.color};">${dateStr}</div>
+            <div class="timeline-dot" style="border-color: ${cat.color}; box-shadow: 0 0 15px ${cat.color}80;"></div>
+            <div class="timeline-content" style="border-top: 4px solid ${cat.color}">
+              <span class="badge" style="background:${cat.color}22; color:${cat.color}; border:1px solid ${cat.color}55; position:absolute; top:var(--space-4); right:var(--space-4);">${catLabel}</span>
+              <div class="timeline-date" style="color: ${cat.color};">${dateStr}</div>
               <div class="timeline-event-title">${localize(e.label)}</div>
               <div class="timeline-desc">${localize(e.description)}</div>
             </div>
