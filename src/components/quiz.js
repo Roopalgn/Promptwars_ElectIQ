@@ -71,6 +71,35 @@ export class QuizState {
 }
 
 /**
+ * Launch a lightweight CSS-based confetti shower over the container.
+ * Respects prefers-reduced-motion.
+ * @param {HTMLElement} container
+ */
+function launchConfetti(container) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (container.querySelector('.confetti-layer')) return; // already firing
+
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+  layer.setAttribute('aria-hidden', 'true');
+
+  const COLORS = ['#FF6B35', '#1A56DB', '#16A34A', '#F59E0B', '#EC4899', '#8B5CF6'];
+  const COUNT = 80;
+  for (let i = 0; i < COUNT; i++) {
+    const piece = document.createElement('span');
+    piece.className = 'confetti-piece';
+    piece.style.background = COLORS[i % COLORS.length];
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.animationDelay = (Math.random() * 0.4) + 's';
+    piece.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    layer.appendChild(piece);
+  }
+  container.appendChild(layer);
+  setTimeout(() => layer.remove(), 4000);
+}
+
+/**
  * Render the Quiz section
  * @param {HTMLElement} container
  */
@@ -93,6 +122,11 @@ export function renderQuiz(container) {
     `;
 
     attachListeners();
+
+    // Celebrate perfect scores
+    if (state.isComplete && state.score === state.questions.length) {
+      launchConfetti(container);
+    }
   };
 
   function renderStartScreen() {

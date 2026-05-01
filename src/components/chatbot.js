@@ -24,7 +24,61 @@ export function renderChatbot(container) {
   let isOpen = false;
   let messages = [];
   let isLoading = false;
+  let recognitionActive = false;
+  let recognitionInstance = null;
   const history = [];
+
+  function startRecognition(SR, input, micBtn) {
+    if (!input) return;
+    try {
+      const rec = new SR();
+      rec.lang = (typeof navigator !== 'undefined' && navigator.language) || 'en-IN';
+      rec.interimResults = true;
+      rec.continuous = false;
+      rec.maxAlternatives = 1;
+
+      let finalText = '';
+      rec.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const res = event.results[i];
+          if (res.isFinal) finalText += res[0].transcript;
+          else interim += res[0].transcript;
+        }
+        input.value = (finalText + interim).trim();
+      };
+      rec.onerror = () => { stopRecognition(); };
+      rec.onend = () => {
+        recognitionActive = false;
+        recognitionInstance = null;
+        if (micBtn) micBtn.classList.remove('listening');
+        if (finalText.trim()) {
+          // Auto-send if we got a complete utterance
+          sendMessage(finalText.trim());
+        } else if (input) {
+          input.focus();
+        }
+      };
+
+      rec.start();
+      recognitionActive = true;
+      recognitionInstance = rec;
+      micBtn.classList.add('listening');
+      trackEvent('chatbot_voice_start');
+    } catch (err) {
+      console.warn('[ElectIQ] Speech recognition failed to start:', err);
+      recognitionActive = false;
+    }
+  }
+
+  function stopRecognition() {
+    if (recognitionInstance) {
+      try { recognitionInstance.stop(); } catch { /* noop */ }
+    }
+    recognitionActive = false;
+    const micBtn = container.querySelector('#chatbot-mic-btn');
+    if (micBtn) micBtn.classList.remove('listening');
+  }
 
   const render = () => {
     container.innerHTML = `
@@ -83,6 +137,14 @@ export function renderChatbot(container) {
                  maxlength="500"
                  autocomplete="off"
                  ${isLoading ? 'disabled' : ''} />
+          <button class="chatbot-mic"
+                  id="chatbot-mic-btn"
+                  type="button"
+                  aria-label="${t('chat.voice')}"
+                  title="${t('chat.voice')}"
+                  ${isLoading ? 'disabled' : ''}>
+            🎙️
+          </button>
           <button class="chatbot-send"
                   id="chatbot-send-btn"
                   aria-label="Send message"
@@ -167,6 +229,22 @@ export function renderChatbot(container) {
           sendMessage(input.value.trim());
         }
       });
+    }
+
+    // Voice input — Web Speech API (powered by Google's speech recognition in Chrome)
+    const micBtn = container.querySelector('#chatbot-mic-btn');
+    if (micBtn) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        micBtn.disabled = true;
+        micBtn.title = 'Voice input not supported in this browser';
+        micBtn.style.opacity = '0.4';
+      } else {
+        micBtn.addEventListener('click', () => {
+          if (recognitionActive) { stopRecognition(); return; }
+          startRecognition(SR, input, micBtn);
+        });
+      }
     }
 
     // Scroll to bottom

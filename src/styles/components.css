@@ -41,21 +41,56 @@
 /* --- New Robust Collapsible Sidebar --- */
 .new-sidebar-overlay {
   position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
-  z-index:var(--z-header); opacity:0; visibility:hidden; transition:all 0.3s ease;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
+  z-index:calc(var(--z-header) + 5);
+  opacity:0; visibility:hidden; transition:opacity 0.3s ease, visibility 0.3s ease;
 }
 .new-sidebar-overlay.active { opacity:1; visibility:visible; }
 
 .new-sidebar {
-  position:fixed; top:0; left:0; bottom:0; width:300px; max-width:85vw;
-  background:var(--bg-base); z-index:calc(var(--z-header) + 1);
-  transform:translateX(-100%); transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position:fixed; top:0; left:0; bottom:0; height:100vh; height:100dvh;
+  width:300px; max-width:85vw;
+  background:#0A0A14;                /* fully opaque base */
+  background:
+    linear-gradient(180deg, rgba(255,107,53,0.08), transparent 60%),
+    #0F0F1A;
+  z-index:calc(var(--z-header) + 10);
+  transform:translateX(-100%);
+  transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display:flex; flex-direction:column;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.5);
-  border-right: 1px solid var(--border-subtle);
-  margin: 0; padding: 0;
+  box-shadow: 8px 0 32px rgba(0,0,0,0.6);
+  border-right: 1px solid var(--border-default);
+  margin: 0; padding: 0; overflow: hidden;
 }
 .new-sidebar.active { transform:translateX(0); }
+.new-sidebar[inert] { pointer-events: none; }
+
+/* Whole-screen blur when sidebar is open.
+   We blur the page content (header, main, chatbot) — but NOT the sidebar
+   itself (which lives outside under #sidebar-root). */
+body.sidebar-open { overflow: hidden; }
+body.sidebar-open .app-header,
+body.sidebar-open main,
+body.sidebar-open #chatbot-container {
+  filter: blur(6px) saturate(0.85);
+  transition: filter 0.3s ease;
+  pointer-events: none;
+}
+body:not(.sidebar-open) .app-header,
+body:not(.sidebar-open) main,
+body:not(.sidebar-open) #chatbot-container {
+  transition: filter 0.3s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.sidebar-open .app-header,
+  body.sidebar-open main,
+  body.sidebar-open #chatbot-container {
+    filter: brightness(0.5);
+  }
+  .new-sidebar { transition: none; }
+  .new-sidebar-overlay { transition: opacity 0.1s; }
+}
 
 .new-sidebar-top {
   padding:var(--space-6); display:flex; align-items:center; justify-content:space-between;
@@ -237,7 +272,7 @@
 .timeline-legend-dot { width:12px; height:12px; border-radius:var(--radius-full); }
 
 /* --- Quiz --- */
-.quiz-container { max-width:700px; margin:0 auto; }
+.quiz-container { max-width:700px; margin:0 auto; position: relative; }
 .quiz-progress-bar { height:6px; background:var(--bg-glass); border-radius:var(--radius-full); margin-bottom:var(--space-8); overflow:hidden; }
 .quiz-progress-fill { height:100%; background:linear-gradient(90deg, var(--color-primary), var(--color-secondary)); border-radius:var(--radius-full); transition:width var(--transition-slow); }
 
@@ -323,7 +358,26 @@
 .quiz-explanation.incorrect-exp { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); }
 .quiz-explanation p { font-size:var(--text-sm); max-width:none; }
 
-.quiz-score-card { text-align:center; padding:var(--space-10); }
+.quiz-score-card { text-align:center; padding:var(--space-10); position: relative; }
+
+/* Confetti overlay for perfect scores */
+.confetti-layer {
+  position: absolute; inset: 0;
+  pointer-events: none; overflow: hidden;
+  z-index: 5;
+}
+.confetti-piece {
+  position: absolute; top: -10%;
+  width: 10px; height: 14px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+  opacity: 0.95;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) rotate(0); opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+}
 .quiz-score-badge { font-size:4rem; margin-bottom:var(--space-4); }
 .quiz-score-title { font-size:var(--text-3xl); font-weight:800; margin-bottom:var(--space-2); }
 .quiz-score-subtitle { font-size:var(--text-lg); color:var(--text-secondary); margin-bottom:var(--space-8); }
@@ -441,6 +495,27 @@
 }
 .chatbot-send:hover { background:var(--color-primary-dark); }
 .chatbot-send:disabled { opacity:0.4; cursor:not-allowed; }
+
+.chatbot-mic {
+  width:40px; height:40px; border-radius:50%; border:1px solid var(--border-default);
+  background:var(--bg-glass); color:var(--text-primary); cursor:pointer; font-size:1rem;
+  display:flex; align-items:center; justify-content:center;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+.chatbot-mic:hover { border-color:var(--color-primary); background:var(--bg-glass-hover); }
+.chatbot-mic:disabled { cursor:not-allowed; }
+.chatbot-mic.listening {
+  background:#EF4444; color:white; border-color:#EF4444;
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+  50%      { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-mic.listening { animation: none; }
+}
 .chatbot-rate-limit { font-size:var(--text-xs); color:var(--text-muted); padding:0 var(--space-4) var(--space-2); }
 
 @media (max-width:480px) {
