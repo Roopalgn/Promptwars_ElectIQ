@@ -34,26 +34,26 @@ export function renderHeader(container, onLangChange) {
             ${t('lang.toggle')}
           </button>
         </div>
-
-        <!-- Sidebar Navigation (Hidden on Homepage) -->
-        <div class="sidebar-overlay ${menuOpen ? 'open' : ''}" id="sidebar-overlay"></div>
-        <nav class="sidebar-nav ${menuOpen ? 'open' : ''}" id="header-nav" role="navigation" aria-label="Main navigation">
-          <div class="sidebar-header">
-             <span class="header-logo-text">Elect<span>IQ</span> Menu</span>
-             <button class="sidebar-close-btn" id="sidebar-close-btn">✕</button>
-          </div>
-          <div class="sidebar-links">
-            <a href="#journey" id="nav-journey"><span>📍</span>${t('nav.journey')}</a>
-            <a href="#timeline" id="nav-timeline"><span>📅</span>${t('nav.timeline')}</a>
-            <a href="#eligibility" id="nav-eligibility"><span>✅</span>${t('nav.eligibility')}</a>
-            <a href="#evm" id="nav-evm"><span>🗳️</span>${t('nav.evm')}</a>
-            <a href="#quiz" id="nav-quiz"><span>🧠</span>${t('nav.quiz')}</a>
-            <a href="#pledge" id="nav-pledge"><span>🤝</span>${t('nav.pledge')}</a>
-            <a href="#glossary" id="nav-glossary"><span>📖</span>${t('nav.glossary')}</a>
-            <a href="#maps" id="nav-maps"><span>📍</span>${t('nav.maps')}</a>
-          </div>
-        </nav>
       </div>
+
+      <!-- Sidebar Navigation (Reworked) -->
+      <div class="new-sidebar-overlay ${menuOpen ? 'active' : ''}" id="sidebar-overlay"></div>
+      <aside class="new-sidebar ${menuOpen ? 'active' : ''}" id="header-nav" aria-label="Main navigation">
+        <div class="new-sidebar-top">
+           <div class="new-sidebar-title">Elect<span>IQ</span></div>
+           <button class="new-sidebar-close" id="sidebar-close-btn" aria-label="Close menu">✕</button>
+        </div>
+        <ul class="new-sidebar-menu">
+          <li><a href="#journey" id="nav-journey"><span class="new-sidebar-icon">📍</span>${t('nav.journey')}</a></li>
+          <li><a href="#timeline" id="nav-timeline"><span class="new-sidebar-icon">📅</span>${t('nav.timeline')}</a></li>
+          <li><a href="#eligibility" id="nav-eligibility"><span class="new-sidebar-icon">✅</span>${t('nav.eligibility')}</a></li>
+          <li><a href="#evm" id="nav-evm"><span class="new-sidebar-icon">🗳️</span>${t('nav.evm')}</a></li>
+          <li><a href="#quiz" id="nav-quiz"><span class="new-sidebar-icon">🧠</span>${t('nav.quiz')}</a></li>
+          <li><a href="#pledge" id="nav-pledge"><span class="new-sidebar-icon">🤝</span>${t('nav.pledge')}</a></li>
+          <li><a href="#glossary" id="nav-glossary"><span class="new-sidebar-icon">📖</span>${t('nav.glossary')}</a></li>
+          <li><a href="#maps" id="nav-maps"><span class="new-sidebar-icon">📍</span>${t('nav.maps')}</a></li>
+        </ul>
+      </aside>
     `;
 
     // Menu toggle
@@ -61,7 +61,7 @@ export function renderHeader(container, onLangChange) {
       menuOpen = !menuOpen;
       render();
       if (menuOpen) {
-        const firstLink = container.querySelector('.sidebar-nav a');
+        const firstLink = container.querySelector('.new-sidebar-menu a');
         if (firstLink) firstLink.focus();
       }
     };
@@ -77,7 +77,7 @@ export function renderHeader(container, onLangChange) {
 
 
     // Close menu when a nav link is clicked
-    container.querySelectorAll('.sidebar-nav a').forEach(link => {
+    container.querySelectorAll('.new-sidebar-menu a').forEach(link => {
       link.addEventListener('click', () => {
         if (menuOpen) { menuOpen = false; render(); }
       });
