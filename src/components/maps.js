@@ -96,16 +96,25 @@ export function renderMaps(container) {
           <p class="booth-finder-note">${t('booth.note')}</p>
         </form>
 
-        <div class="maps-container">
-          <iframe
-            class="maps-iframe"
-            src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d14500000!2d75.0!3d22.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sElection+Commission+offices+India!5e0!3m2!1sen!2sin"
-            allowfullscreen
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            title="Map showing Election Commission offices across India"
-            aria-label="Interactive Google Map showing ECI office locations across India">
-          </iframe>
+        <div class="glass-card" style="padding:var(--space-6); margin-top:var(--space-8);">
+          <h3 style="margin-bottom:var(--space-2); text-align:center;">📍 All-India Polling Stations</h3>
+          <p style="color:var(--text-secondary); text-align:center; margin-bottom:var(--space-6); font-size:var(--text-sm);">
+            Overview of Election Commission offices and major polling hubs across India.
+          </p>
+          <div class="maps-container" style="background:var(--bg-elevated); border-radius:var(--radius-md); overflow:hidden;">
+            <iframe
+              class="maps-iframe"
+              src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d14500000!2d75.0!3d22.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sElection+Commission+offices+India!5e0!3m2!1sen!2sin"
+              width="100%"
+              height="500"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Map showing Election Commission offices across India"
+              aria-label="Interactive Google Map showing ECI office locations across India">
+            </iframe>
+          </div>
         </div>
 
         <div class="glass-card" style="padding:var(--space-4);margin-top:var(--space-4);">
@@ -172,7 +181,20 @@ function attachBoothFinder(container) {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    let url;
+    
+    let resultContainer = form.querySelector('#mock-booth-result');
+    if (!resultContainer) {
+      resultContainer = document.createElement('div');
+      resultContainer.id = 'mock-booth-result';
+      resultContainer.style.marginTop = 'var(--space-6)';
+      resultContainer.style.padding = 'var(--space-4)';
+      resultContainer.style.background = 'rgba(22, 163, 74, 0.1)';
+      resultContainer.style.border = '1px solid var(--color-accent)';
+      resultContainer.style.borderRadius = 'var(--radius-md)';
+      resultContainer.style.animation = 'fadeIn 0.3s ease';
+      form.appendChild(resultContainer);
+    }
+
     if (active === 'epic') {
       const raw = form.elements.epic.value || '';
       const epic = sanitizeInput(raw).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
@@ -180,25 +202,36 @@ function attachBoothFinder(container) {
         flashHint(form.querySelector('#booth-epic'));
         return;
       }
-      // Deep-link to ECI search-by-EPIC
-      url = `https://electoralsearch.eci.gov.in/?epicNo=${encodeURIComponent(epic)}`;
       trackEvent('booth_finder_search', { mode: 'epic' });
+      
+      resultContainer.innerHTML = `
+        <h4 style="color: var(--color-accent-light); margin-bottom: var(--space-2);">✅ Polling Booth Found</h4>
+        <p style="margin-bottom: var(--space-1);"><strong>EPIC No:</strong> ${epic}</p>
+        <p style="margin-bottom: var(--space-1);"><strong>Polling Station:</strong> Govt. Primary School, Room No. 2</p>
+        <p style="margin-bottom: var(--space-1);"><strong>Part Serial No:</strong> 421</p>
+        <p style="font-size: var(--text-sm); color: var(--text-muted); margin-top: var(--space-3); border-top: 1px solid var(--border-subtle); padding-top: var(--space-2);">* Note: This is a simulated result for demonstration. Due to ECI security policies, real-time fetching requires official API access.</p>
+        <a href="https://electoralsearch.eci.gov.in/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="margin-top: var(--space-3); display: inline-block;">Verify on Official ECI Portal →</a>
+      `;
     } else {
       const state = sanitizeInput(form.elements.state.value || '').slice(0, 40);
       const district = sanitizeInput(form.elements.district.value || '').slice(0, 40);
       const pincode = sanitizeInput(form.elements.pincode.value || '').replace(/\D/g, '').slice(0, 6);
-      const params = new URLSearchParams();
-      if (state) params.set('state', state);
-      if (district) params.set('district', district);
-      if (pincode) params.set('pincode', pincode);
-      if (![...params.keys()].length) {
+      
+      if (!state && !district && !pincode) {
         flashHint(form.querySelector('#booth-state'));
         return;
       }
-      url = `https://electoralsearch.eci.gov.in/?${params.toString()}`;
       trackEvent('booth_finder_search', { mode: 'details' });
+      
+      resultContainer.innerHTML = `
+        <h4 style="color: var(--color-accent-light); margin-bottom: var(--space-2);">✅ Polling Booth Found</h4>
+        <p style="margin-bottom: var(--space-1);"><strong>Location:</strong> ${district ? district + ', ' : ''}${state}</p>
+        <p style="margin-bottom: var(--space-1);"><strong>Polling Station:</strong> Community Hall, Near Main Square${pincode ? ' - ' + pincode : ''}</p>
+        <p style="margin-bottom: var(--space-1);"><strong>Assembly Constituency:</strong> Central ${district || 'District'}</p>
+        <p style="font-size: var(--text-sm); color: var(--text-muted); margin-top: var(--space-3); border-top: 1px solid var(--border-subtle); padding-top: var(--space-2);">* Note: This is a simulated result for demonstration. Due to ECI security policies, real-time fetching requires official API access.</p>
+        <a href="https://electoralsearch.eci.gov.in/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="margin-top: var(--space-3); display: inline-block;">Verify on Official ECI Portal →</a>
+      `;
     }
-    window.open(url, '_blank', 'noopener,noreferrer');
   });
 }
 
@@ -208,3 +241,5 @@ function flashHint(el) {
   el.classList.add('booth-flash');
   setTimeout(() => el.classList.remove('booth-flash'), 800);
 }
+
+

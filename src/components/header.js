@@ -85,6 +85,7 @@ export function renderHeader(container, onLangChange) {
         </div>
         <ul class="new-sidebar-menu">
           <li><a href="#journey" id="nav-journey"><span class="new-sidebar-icon">📍</span>${t('nav.journey')}</a></li>
+          <li><a href="#simulator" id="nav-simulator"><span class="new-sidebar-icon">🎮</span>Simulator</a></li>
           <li><a href="#timeline" id="nav-timeline"><span class="new-sidebar-icon">📅</span>${t('nav.timeline')}</a></li>
           <li><a href="#eligibility" id="nav-eligibility"><span class="new-sidebar-icon">✅</span>${t('nav.eligibility')}</a></li>
           <li><a href="#evm" id="nav-evm"><span class="new-sidebar-icon">🗳️</span>${t('nav.evm')}</a></li>

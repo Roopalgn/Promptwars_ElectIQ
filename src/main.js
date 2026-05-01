@@ -16,6 +16,7 @@ import { renderTimeline } from './components/timeline.js';
 import { renderQuiz } from './components/quiz.js';
 import { renderGlossary } from './components/glossary.js';
 import { renderMaps } from './components/maps.js';
+import { renderSimulator } from './components/simulator.js';
 import { renderChatbot } from './components/chatbot.js';
 import { renderCountdown } from './components/countdown.js';
 import { renderEligibility } from './components/eligibility.js';
@@ -62,6 +63,7 @@ function init() {
   components.eligibility = safeRender('eligibility', renderEligibility);
   components.checklist = safeRender('checklist', renderChecklist);
   components.evm = safeRender('evm', renderEvmSimulator);
+  components.simulator = safeRender('simulator', renderSimulator);
   components.quiz = safeRender('quiz', renderQuiz);
   components.pledge = safeRender('pledge', renderPledge);
   components.glossary = safeRender('glossary', renderGlossary);
@@ -107,7 +109,7 @@ function safeRender(containerId, renderFn) {
  * Hides non-active sections to simulate separate pages.
  */
 function initRouter() {
-  const sections = ['hero', 'feature-grid', 'countdown', 'journey', 'timeline', 'eligibility', 'checklist', 'evm', 'quiz', 'pledge', 'glossary', 'maps'];
+  const sections = ['hero', 'feature-grid', 'countdown', 'journey', 'timeline', 'eligibility', 'checklist', 'evm', 'simulator', 'quiz', 'pledge', 'glossary', 'maps'];
   
   function handleRoute() {
     const hash = window.location.hash.slice(1) || 'hero';
@@ -238,6 +240,7 @@ function renderFeatureGrid() {
     { id: 'timeline', icon: '📅', title: t('nav.timeline'), desc: 'Explore all the important election phases.' },
     { id: 'eligibility', icon: '✅', title: t('nav.eligibility'), desc: 'Check if you are eligible to vote.' },
     { id: 'evm', icon: '🗳️', title: t('nav.evm'), desc: 'Try our interactive EVM simulator.' },
+    { id: 'simulator', icon: '💻', title: 'Simulator', desc: 'Try our advanced election simulator.' },
     { id: 'quiz', icon: '🧠', title: t('nav.quiz'), desc: 'Test your election knowledge.' },
     { id: 'pledge', icon: '🤝', title: t('nav.pledge'), desc: 'Take the voter pledge today.' },
     { id: 'glossary', icon: '📖', title: t('nav.glossary'), desc: 'Learn common election terminology.' },

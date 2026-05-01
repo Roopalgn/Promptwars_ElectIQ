@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" 
         content="default-src 'self'; 
-               script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.googletagmanager.com; 
-               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.google.com https://www.googletagmanager.com; 
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; 
                font-src https://fonts.gstatic.com; 
                img-src 'self' data: https://*.googleapis.com https://*.gstatic.com https://www.googletagmanager.com; 
                connect-src 'self' https://generativelanguage.googleapis.com https://www.google-analytics.com https://analytics.google.com; 
-               frame-src https://www.google.com https://maps.google.com https://www.google.com/maps;" />
+               frame-src 'self' https://www.google.com https://maps.google.com https://www.google.com/maps;" />
 
   <!-- SEO -->
   <title>ElectIQ — India's Smartest Election Education Assistant</title>
@@ -184,11 +184,14 @@
     <!-- Voter Pledge -->
     <section id="pledge" class="section" aria-labelledby="pledge-title"></section>
 
-    <!-- Glossary -->
-    <section id="glossary" class="section" aria-labelledby="glossary-title"></section>
+    <!-- Glossary Section -->
+    <section id="glossary" class="section" hidden aria-labelledby="glossary-title"></section>
 
-    <!-- Maps -->
-    <section id="maps" class="section" aria-labelledby="maps-title"></section>
+    <!-- Map Section -->
+    <section id="maps" class="section" hidden aria-labelledby="maps-title"></section>
+
+    <!-- Simulator Section -->
+    <section id="simulator" class="section" hidden aria-labelledby="simulator-title"></section>
   </main>
 
   <!-- Chatbot Widget -->
