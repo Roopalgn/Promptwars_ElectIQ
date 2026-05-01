@@ -1,10 +1,17 @@
-const CACHE_NAME = 'electiq-v2';
+const CACHE_NAME = 'electiq-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/app.css',
   '/manifest.json'
 ];
+
+// Allow page to trigger immediate activation when user clicks "Refresh".
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 // Install — cache app shell
 self.addEventListener('install', (event) => {
@@ -13,7 +20,8 @@ self.addEventListener('install', (event) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
-  self.skipWaiting();
+  // Note: we DO NOT call self.skipWaiting() here — we wait for an explicit
+  // user gesture so we don't drop their state mid-interaction.
 });
 
 // Activate — clean old caches

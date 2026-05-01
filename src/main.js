@@ -25,6 +25,7 @@ import { renderPledge } from './components/pledge.js';
 import { t, getLang } from './utils/i18n.js';
 import { initAnalytics } from './utils/analytics.js';
 import { initPerformanceMonitoring, addResourceHints } from './utils/performance.js';
+import { initTheme } from './utils/theme.js';
 
 /** Component references for re-rendering on language change */
 const components = {};
@@ -34,6 +35,10 @@ const components = {};
  */
 function init() {
   document.documentElement.lang = getLang();
+
+  // Apply persisted theme as early as possible (also done inline in <head>
+  // for first paint, but re-run here to attach system-change listener).
+  initTheme();
 
   // Initialize Google Analytics 4
   initAnalytics();
@@ -288,16 +293,73 @@ function initScrollReveal() {
 }
 
 /**
- * Register the Service Worker for PWA / offline support
+ * Register the Service Worker for PWA / offline support.
+ * Detects when a new SW has installed and is waiting, then shows a
+ * non-blocking "New version available" banner. Clicking refresh sends
+ * SKIP_WAITING to the worker and reloads once it activates.
  */
 function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        // SW registration failed — non-critical
+  if (!('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((reg) => {
+      // If a worker is already waiting (e.g. user returned to a stale tab)
+      if (reg.waiting && navigator.serviceWorker.controller) {
+        showUpdateBanner(reg.waiting);
+      }
+      // Watch for new updates while page is open
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner(newWorker);
+          }
+        });
       });
+    }).catch(() => {
+      // SW registration failed — non-critical
     });
-  }
+
+    // When the new SW activates, reload exactly once so users see new assets
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    });
+  });
+}
+
+/**
+ * Display a dismissible banner offering to refresh for new content.
+ * @param {ServiceWorker} waitingWorker
+ */
+function showUpdateBanner(waitingWorker) {
+  if (document.getElementById('sw-update-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'sw-update-banner';
+  banner.className = 'sw-update-banner';
+  banner.setAttribute('role', 'status');
+  banner.setAttribute('aria-live', 'polite');
+  banner.innerHTML = `
+    <span class="sw-update-icon" aria-hidden="true">✨</span>
+    <span class="sw-update-text">A new version of ElectIQ is available.</span>
+    <button type="button" class="sw-update-refresh" id="sw-update-refresh">Refresh</button>
+    <button type="button" class="sw-update-dismiss" id="sw-update-dismiss" aria-label="Dismiss">✕</button>
+  `;
+  document.body.appendChild(banner);
+  // Animate in
+  requestAnimationFrame(() => banner.classList.add('visible'));
+
+  banner.querySelector('#sw-update-refresh').addEventListener('click', () => {
+    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+  });
+  banner.querySelector('#sw-update-dismiss').addEventListener('click', () => {
+    banner.classList.remove('visible');
+    setTimeout(() => banner.remove(), 300);
+  });
 }
 
 // Boot the app when DOM is ready

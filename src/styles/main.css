@@ -45,6 +45,39 @@
   --z-base: 1; --z-header: 100; --z-modal: 200; --z-chatbot: 300; --z-skip: 400;
 }
 
+/* --- Light theme override (data-theme="light" applied by theme.js) --- */
+[data-theme="light"] {
+  --bg-base: #F7F7FB;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-card: rgba(0,0,0,0.03);
+  --bg-glass: rgba(255,255,255,0.7);
+  --bg-glass-hover: rgba(255,255,255,0.95);
+  --bg-input: rgba(0,0,0,0.04);
+  --text-primary: #0F0F1A;
+  --text-secondary: #4A4A5C;
+  --text-muted: #6B6B82;
+  --text-inverse: #FFFFFF;
+  --border-subtle: rgba(0,0,0,0.08);
+  --border-default: rgba(0,0,0,0.14);
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.06);
+  --shadow-md: 0 4px 12px rgba(15,23,42,0.10);
+  --shadow-lg: 0 12px 32px rgba(15,23,42,0.14);
+}
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(255,107,53,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(26,86,219,0.05) 0%, transparent 70%) !important;
+}
+
+/* Smooth theme transition */
+html, body, .glass-card, .app-header, .new-sidebar {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  html, body, .glass-card, .app-header, .new-sidebar { transition: none; }
+}
+
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 html { font-size:16px; scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
 

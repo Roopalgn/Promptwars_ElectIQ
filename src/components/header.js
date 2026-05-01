@@ -4,6 +4,7 @@
  */
 
 import { t, toggleLang, getLang } from '../utils/i18n.js';
+import { cycleTheme, getStoredTheme, getThemeLabel } from '../utils/theme.js';
 
 /**
  * Render the header into the target element.
@@ -44,6 +45,11 @@ export function renderHeader(container, onLangChange) {
         </a>
 
         <div class="header-actions">
+          <button class="theme-toggle" id="theme-toggle-btn"
+                  aria-label="${t('theme.toggle')}"
+                  title="${t('theme.toggle')} — ${getStoredTheme()}">
+            ${getThemeLabel()}
+          </button>
           <button class="lang-toggle" id="lang-toggle-btn" aria-label="Switch language">
             ${t('lang.toggle')}
           </button>
@@ -58,6 +64,14 @@ export function renderHeader(container, onLangChange) {
       renderHeaderBar();
       if (onLangChange) onLangChange(getLang());
     });
+    const themeBtn = container.querySelector('#theme-toggle-btn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const next = cycleTheme();
+        themeBtn.textContent = getThemeLabel(next);
+        themeBtn.title = `${t('theme.toggle')} — ${next}`;
+      });
+    }
   };
 
   const renderSidebar = () => {

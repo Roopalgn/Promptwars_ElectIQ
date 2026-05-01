@@ -4,6 +4,8 @@
  */
 
 import { t } from '../utils/i18n.js';
+import { sanitizeInput } from '../utils/sanitizer.js';
+import { trackEvent } from '../utils/analytics.js';
 
 /**
  * Build a Google Maps embed URL.
@@ -49,6 +51,51 @@ export function renderMaps(container) {
           </div>
         </div>
 
+        <!-- Booth Finder: deep-link to electoralsearch.eci.gov.in with prefilled query -->
+        <form class="glass-card booth-finder" id="booth-finder" novalidate>
+          <h3 class="booth-finder-title">📍 ${t('booth.title')}</h3>
+          <p class="booth-finder-subtitle">${t('booth.subtitle')}</p>
+
+          <div class="booth-finder-tabs" role="tablist">
+            <button type="button" role="tab" id="booth-tab-epic" class="booth-tab active" data-tab="epic" aria-selected="true">${t('booth.byEpic')}</button>
+            <button type="button" role="tab" id="booth-tab-details" class="booth-tab" data-tab="details" aria-selected="false">${t('booth.byDetails')}</button>
+          </div>
+
+          <div class="booth-tab-panel" id="booth-panel-epic" role="tabpanel" aria-labelledby="booth-tab-epic">
+            <label for="booth-epic">${t('booth.epicLabel')}</label>
+            <input type="text" id="booth-epic" name="epic" maxlength="20"
+                   pattern="[A-Za-z0-9]{6,20}"
+                   placeholder="ABC1234567"
+                   autocomplete="off"
+                   inputmode="latin"
+                   aria-describedby="booth-epic-hint" />
+            <small id="booth-epic-hint" class="booth-hint">${t('booth.epicHint')}</small>
+          </div>
+
+          <div class="booth-tab-panel" id="booth-panel-details" role="tabpanel" aria-labelledby="booth-tab-details" hidden>
+            <div class="booth-grid">
+              <div>
+                <label for="booth-state">${t('booth.state')}</label>
+                <input type="text" id="booth-state" name="state" maxlength="40" autocomplete="address-level1" />
+              </div>
+              <div>
+                <label for="booth-district">${t('booth.district')}</label>
+                <input type="text" id="booth-district" name="district" maxlength="40" autocomplete="address-level2" />
+              </div>
+              <div>
+                <label for="booth-pincode">${t('booth.pincode')}</label>
+                <input type="text" id="booth-pincode" name="pincode" maxlength="6"
+                       pattern="[0-9]{6}" inputmode="numeric" autocomplete="postal-code" />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary booth-submit">
+            🔎 ${t('booth.find')}
+          </button>
+          <p class="booth-finder-note">${t('booth.note')}</p>
+        </form>
+
         <div class="maps-container">
           <iframe
             class="maps-iframe"
@@ -90,8 +137,74 @@ export function renderMaps(container) {
         </div>
       </div>
     `;
+    attachBoothFinder(container);
   };
 
   render();
   return { rerender: render };
+}
+
+/** Attach interactivity to the booth finder form. */
+function attachBoothFinder(container) {
+  const form = container.querySelector('#booth-finder');
+  if (!form) return;
+
+  // Tab switching
+  const tabs = form.querySelectorAll('.booth-tab');
+  const panels = {
+    epic: form.querySelector('#booth-panel-epic'),
+    details: form.querySelector('#booth-panel-details')
+  };
+  let active = 'epic';
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      active = tab.dataset.tab;
+      tabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-selected', String(isActive));
+      });
+      Object.entries(panels).forEach(([name, panel]) => {
+        if (panel) panel.hidden = name !== active;
+      });
+    });
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let url;
+    if (active === 'epic') {
+      const raw = form.elements.epic.value || '';
+      const epic = sanitizeInput(raw).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      if (epic.length < 6) {
+        flashHint(form.querySelector('#booth-epic'));
+        return;
+      }
+      // Deep-link to ECI search-by-EPIC
+      url = `https://electoralsearch.eci.gov.in/?epicNo=${encodeURIComponent(epic)}`;
+      trackEvent('booth_finder_search', { mode: 'epic' });
+    } else {
+      const state = sanitizeInput(form.elements.state.value || '').slice(0, 40);
+      const district = sanitizeInput(form.elements.district.value || '').slice(0, 40);
+      const pincode = sanitizeInput(form.elements.pincode.value || '').replace(/\D/g, '').slice(0, 6);
+      const params = new URLSearchParams();
+      if (state) params.set('state', state);
+      if (district) params.set('district', district);
+      if (pincode) params.set('pincode', pincode);
+      if (![...params.keys()].length) {
+        flashHint(form.querySelector('#booth-state'));
+        return;
+      }
+      url = `https://electoralsearch.eci.gov.in/?${params.toString()}`;
+      trackEvent('booth_finder_search', { mode: 'details' });
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  });
+}
+
+function flashHint(el) {
+  if (!el) return;
+  el.focus();
+  el.classList.add('booth-flash');
+  setTimeout(() => el.classList.remove('booth-flash'), 800);
 }

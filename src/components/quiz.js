@@ -219,6 +219,12 @@ export function renderQuiz(container) {
 
         <div class="quiz-score-actions">
           <button class="btn btn-primary" id="quiz-retry-btn">${t('quiz.retry')}</button>
+          <a class="btn btn-secondary quiz-share-x" id="quiz-share-x-btn"
+             href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Share on X (Twitter)">
+            <span aria-hidden="true">𝕏</span> ${t('quiz.shareX')}
+          </a>
           <button class="btn btn-secondary" id="quiz-share-btn">📤 ${t('quiz.share')}</button>
         </div>
       </div>
@@ -282,6 +288,13 @@ export function renderQuiz(container) {
           }).catch(() => {});
         }
         trackEvent('quiz_share', { score: state.score });
+      });
+    }
+
+    const shareXBtn = container.querySelector('#quiz-share-x-btn');
+    if (shareXBtn) {
+      shareXBtn.addEventListener('click', () => {
+        trackEvent('quiz_share', { score: state.score, channel: 'x_twitter' });
       });
     }
   }

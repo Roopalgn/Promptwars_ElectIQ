@@ -70,6 +70,63 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗳️</text></svg>" />
 
+  <!-- Theme bootstrap — runs synchronously before paint to avoid FOUC.
+       Must mirror the small subset of theme.js that decides effective theme. -->
+  <script>
+    (function () {
+      try {
+        var v = localStorage.getItem('electiq-theme');
+        var stored = (v === 'light' || v === 'dark' || v === 'system') ? v : 'system';
+        var effective = stored;
+        if (stored === 'system') {
+          effective = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', effective);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', effective === 'light' ? '#FFFFFF' : '#0A0A14');
+      } catch (e) { /* localStorage unavailable */ }
+    })();
+  </script>
+
+  <!-- Critical CSS — inlined to avoid render-blocking + FOUC for the first viewport.
+       Kept tiny: only design tokens, body/header skeleton, and the loading shell. -->
+  <style>
+    :root {
+      --color-primary: #FF6B35;
+      --bg-base: #0A0A14;
+      --text-primary: #F1F1F4;
+      --text-muted: #6B6B82;
+      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    [data-theme="light"] { --bg-base: #F7F7FB; --text-primary: #0F0F1A; --text-muted: #6B6B82; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body); line-height: 1.7;
+      color: var(--text-primary); background: var(--bg-base);
+      min-height: 100vh; overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .skip-link {
+      position: fixed; top: -100%; left: 1rem; padding: 0.75rem 1.5rem;
+      background: var(--color-primary); color: #0A0A14;
+      font-weight: 600; border-radius: 0 0 10px 10px; z-index: 400;
+      text-decoration: none; transition: top 150ms;
+    }
+    .skip-link:focus { top: 0; outline: 3px solid #3B82F6; outline-offset: 2px; }
+    .app-loading {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 60vh; gap: 1rem; color: var(--text-muted);
+    }
+    .app-loading-spinner {
+      width: 36px; height: 36px; border: 3px solid rgba(255,107,53,0.2);
+      border-top-color: var(--color-primary); border-radius: 50%;
+      animation: app-spin 0.8s linear infinite;
+    }
+    @keyframes app-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .app-loading-spinner { animation: none; } }
+  </style>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -83,8 +140,10 @@
     window.__GA_ID__ = '';
   </script>
 
-  <!-- Styles — served from public/ so browser receives real CSS, not Vite JS modules -->
-  <link rel="stylesheet" href="/app.css" />
+  <!-- Styles — served from public/ so browser receives real CSS, not Vite JS modules.
+       Loaded async via media trick to remove render-blocking.  -->
+  <link rel="stylesheet" href="/app.css" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="/app.css" /></noscript>
 </head>
 <body>
   <!-- Skip Navigation (Accessibility) -->
