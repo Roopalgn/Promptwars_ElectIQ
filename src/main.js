@@ -108,13 +108,10 @@ function initRouter() {
     const hash = window.location.hash.slice(1) || 'hero';
     const isHome = hash === 'hero' || hash === '';
 
-    const header = document.getElementById('app-header');
-    if (header) {
-      if (isHome) {
-        header.classList.add('header-hidden');
-      } else {
-        header.classList.remove('header-hidden');
-      }
+    if (isHome) {
+      document.body.classList.add('is-home');
+    } else {
+      document.body.classList.remove('is-home');
     }
 
     sections.forEach(id => {
@@ -189,11 +186,6 @@ function renderHero() {
   const hero = document.getElementById('hero');
   hero.innerHTML = `
     <div class="hero-content">
-      <div class="homepage-logo animate-fade-in-down">
-        <span class="logo-icon" aria-hidden="true">🗳️</span>
-        <span class="logo-text">Elect<span>IQ</span></span>
-      </div>
-
       <div class="hero-badge animate-fade-in-down delay-1">
         <span class="badge badge-primary">✨ ${t('hero.badge')}</span>
       </div>
@@ -242,7 +234,9 @@ function renderFeatureGrid() {
     { id: 'eligibility', icon: '✅', title: t('nav.eligibility'), desc: 'Check if you are eligible to vote.' },
     { id: 'evm', icon: '🗳️', title: t('nav.evm'), desc: 'Try our interactive EVM simulator.' },
     { id: 'quiz', icon: '🧠', title: t('nav.quiz'), desc: 'Test your election knowledge.' },
-    { id: 'pledge', icon: '🤝', title: t('nav.pledge'), desc: 'Take the voter pledge today.' }
+    { id: 'pledge', icon: '🤝', title: t('nav.pledge'), desc: 'Take the voter pledge today.' },
+    { id: 'glossary', icon: '📖', title: t('nav.glossary'), desc: 'Learn common election terminology.' },
+    { id: 'maps', icon: '📍', title: t('nav.maps'), desc: 'Find your nearest polling booth.' }
   ];
 
   grid.innerHTML = `
