@@ -43,12 +43,12 @@
   background:var(--bg-glass); border:1px solid var(--border-subtle);
   color:var(--text-primary); font-size:1.1rem; cursor:pointer;
   transition:all var(--transition-fast); min-height:44px; min-width:44px;
-  display:inline-flex; align-items:center; justify-content:center;
+  display:flex; align-items:center; justify-content:center;
   margin-right: var(--space-2);
 }
 .theme-toggle:hover {
   border-color:var(--color-primary);
-  transform: rotate(15deg) scale(1.05);
+  background:var(--bg-glass-hover);
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-toggle:hover { transform: none; }

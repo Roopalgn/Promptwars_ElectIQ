@@ -11,17 +11,17 @@ export function renderSimulator(container) {
   const renderScenarioList = () => {
     container.innerHTML = `
       <div class="section-header reveal">
-        <h2>Interactive Scenario Simulator</h2>
-        <p>Explore real-world election edge cases. What happens if...</p>
+        <h2>${t('sim.title')}</h2>
+        <p>${t('sim.subtitle')}</p>
       </div>
       <div class="scenario-grid reveal">
         ${Object.values(scenarios).map(s => `
           <div class="glass-card scenario-card" data-id="${s.id}">
             <div class="scenario-icon">${s.icon}</div>
             <div class="scenario-content">
-              <h3 style="margin-bottom: var(--space-2);">${s.title}</h3>
-              <p style="color: var(--text-secondary); margin-bottom: var(--space-4);">${s.description}</p>
-              <button class="btn btn-primary" style="margin-top: auto;">Simulate ➔</button>
+              <h3 style="margin-bottom: var(--space-2);">${t(`sim.${s.id}.title`) || s.title}</h3>
+              <p style="color: var(--text-secondary); margin-bottom: var(--space-4);">${t(`sim.${s.id}.desc`) || s.description}</p>
+              <button class="btn btn-primary" style="margin-top: auto;">${t('sim.start')} ➔</button>
             </div>
           </div>
         `).join('')}
