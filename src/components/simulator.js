@@ -1,7 +1,7 @@
 import { scenarios } from '../data/scenarios.js';
 import { askGemini } from '../api/gemini.js';
 import { marked } from 'marked';
-import { t } from '../utils/i18n.js';
+import { t, getLang } from '../utils/i18n.js';
 
 // Module-level state to persist across language toggles
 let activeScenario = null;
@@ -51,31 +51,38 @@ export function renderSimulator(container) {
       path.push(currentNodeId);
     }
 
+    const lang = getLang();
+    const getProp = (obj, prop) => (lang === 'hi' && obj[`${prop}_hi`]) ? obj[`${prop}_hi`] : obj[prop];
+
     // Build breadcrumbs
-    const breadcrumbs = path.map((n, i) => `<span class="crumb ${i === path.length-1 ? 'active' : ''}">Step ${i+1}</span>`).join(' > ');
+    const breadcrumbs = path.map((n, i) => `<span class="crumb ${i === path.length-1 ? 'active' : ''}">${t('journey.step')} ${i+1}</span>`).join(' > ');
 
     const severityColor = node.severity === 'critical' ? 'var(--color-danger)' : node.severity === 'warning' ? 'var(--color-warning)' : 'var(--color-success)';
+
+    const deadlineStr = getProp(node, 'deadline');
+    const consequencesList = getProp(node, 'consequences') || [];
+    const recoveryList = getProp(node, 'recovery') || [];
 
     container.innerHTML = `
       <div class="simulator-layout reveal">
         <div class="simulator-main">
-          <button class="btn btn-secondary" id="back-to-sims" style="margin-bottom: var(--space-4);">← Back to Scenarios</button>
+          <button class="btn btn-secondary" id="back-to-sims" style="margin-bottom: var(--space-4);">← ${t('journey.prev') || 'Back'}</button>
           <div class="simulator-breadcrumbs">${breadcrumbs}</div>
           
           <div class="glass-card simulator-view" style="border-top: 4px solid ${severityColor};">
             <div class="severity-badge ${node.severity}">${node.severity.toUpperCase()}</div>
-            <h3 class="simulator-message" style="margin-bottom: var(--space-4); margin-top: var(--space-4);">${node.message}</h3>
+            <h3 class="simulator-message" style="margin-bottom: var(--space-4); margin-top: var(--space-4);">${getProp(node, 'message')}</h3>
             
             <div class="simulator-ai-help" style="margin-bottom: var(--space-6);">
-              <button class="btn btn-secondary" id="ask-ai-btn" style="padding: 6px 12px; font-size: var(--text-sm);">🤖 Explain this simply</button>
+              <button class="btn btn-secondary" id="ask-ai-btn" style="padding: 6px 12px; font-size: var(--text-sm);">🤖 ${lang === 'hi' ? 'इसे आसानी से समझाएं' : 'Explain this simply'}</button>
               <div id="ai-explanation" style="display:none; margin-top: var(--space-3); padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-md); font-size: var(--text-sm); border: 1px solid var(--border-subtle);"></div>
             </div>
 
             <div class="simulator-options">
-              <h4 style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-muted); text-transform: uppercase;">Your Options</h4>
+              <h4 style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-muted); text-transform: uppercase;">${lang === 'hi' ? 'आपके विकल्प' : 'Your Options'}</h4>
               ${node.options.map((opt, i) => `
                 <button class="btn btn-primary simulator-option-btn w-full" style="margin-bottom: var(--space-3); width: 100%; display: block; text-align: left; height: auto; padding: 16px;" data-next="${opt.next || ''}">
-                  ${opt.label}
+                  ${getProp(opt, 'label')}
                 </button>
               `).join('')}
             </div>
@@ -84,26 +91,26 @@ export function renderSimulator(container) {
 
         <div class="simulator-sidebar">
           <div class="glass-card outcome-panel">
-            <h4 style="margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">Outcome Panel</h4>
+            <h4 style="margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">${lang === 'hi' ? 'परिणाम पैनल' : 'Outcome Panel'}</h4>
             
-            ${node.deadline ? `
+            ${deadlineStr ? `
               <div class="outcome-section" style="margin-bottom: var(--space-4);">
-                <h5 style="color: var(--color-primary-light); margin-bottom: var(--space-2); display:flex; align-items:center; gap:8px;">⏳ Deadline</h5>
-                <p style="font-size: var(--text-sm); color: var(--text-secondary);">${node.deadline}</p>
+                <h5 style="color: var(--color-primary-light); margin-bottom: var(--space-2); display:flex; align-items:center; gap:8px;">⏳ ${lang === 'hi' ? 'समय सीमा' : 'Deadline'}</h5>
+                <p style="font-size: var(--text-sm); color: var(--text-secondary);">${deadlineStr}</p>
               </div>
             ` : ''}
             
-            ${node.consequences && node.consequences.length > 0 ? `
+            ${consequencesList.length > 0 ? `
               <div class="outcome-section" style="margin-bottom: var(--space-4);">
-                <h5 style="color: var(--color-danger); margin-bottom: var(--space-2); display:flex; align-items:center; gap:8px;">⚠️ Consequences</h5>
-                <ul style="padding-left: 20px; font-size: var(--text-sm); color: var(--text-secondary);">${node.consequences.map(c => `<li style="margin-bottom:4px;">${c}</li>`).join('')}</ul>
+                <h5 style="color: var(--color-danger); margin-bottom: var(--space-2); display:flex; align-items:center; gap:8px;">⚠️ ${lang === 'hi' ? 'परिणाम' : 'Consequences'}</h5>
+                <ul style="padding-left: 20px; font-size: var(--text-sm); color: var(--text-secondary);">${consequencesList.map(c => `<li style="margin-bottom:4px;">${c}</li>`).join('')}</ul>
               </div>
             ` : ''}
             
-            ${node.recovery && node.recovery.length > 0 ? `
+            ${recoveryList.length > 0 ? `
               <div class="outcome-section" style="margin-bottom: var(--space-4);">
-                <h5 style="color: var(--color-success); margin-bottom: var(--space-2); display:flex; align-items:center; gap:8px;">🛠️ Recovery Steps</h5>
-                <ol style="padding-left: 20px; font-size: var(--text-sm); color: var(--text-secondary);">${node.recovery.map(r => `<li style="margin-bottom:4px;">${r}</li>`).join('')}</ol>
+                <h5 style="color: var(--color-success); margin-bottom: var(--space-2); display:flex; align-items:center; gap:8px;">🛠️ ${lang === 'hi' ? 'अगला कदम' : 'Recovery Steps'}</h5>
+                <ol style="padding-left: 20px; font-size: var(--text-sm); color: var(--text-secondary);">${recoveryList.map(r => `<li style="margin-bottom:4px;">${r}</li>`).join('')}</ol>
               </div>
             ` : ''}
           </div>
@@ -148,11 +155,12 @@ export function renderSimulator(container) {
 
   const renderFinish = () => {
     isFinished = true;
+    const lang = getLang();
     container.innerHTML = `
       <div class="glass-card text-center reveal" style="max-width: 600px; margin: 40px auto; padding: var(--space-8);">
-        <h2 style="margin-bottom: var(--space-4);">🏁 Simulation Complete</h2>
-        <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">You have successfully navigated this scenario.</p>
-        <button class="btn btn-primary" id="restart-sim">Explore Another Scenario</button>
+        <h2 style="margin-bottom: var(--space-4);">🏁 ${lang === 'hi' ? 'सिमुलेशन पूरा हुआ' : 'Simulation Complete'}</h2>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">${lang === 'hi' ? 'आपने इस परिदृश्य को सफलतापूर्वक पूरा कर लिया है।' : 'You have successfully navigated this scenario.'}</p>
+        <button class="btn btn-primary" id="restart-sim">${lang === 'hi' ? 'एक और परिदृश्य खोजें' : 'Explore Another Scenario'}</button>
       </div>
     `;
     container.querySelector('#restart-sim').addEventListener('click', () => {
