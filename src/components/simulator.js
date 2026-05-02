@@ -3,11 +3,13 @@ import { askGemini } from '../api/gemini.js';
 import { marked } from 'marked';
 import { t } from '../utils/i18n.js';
 
-export function renderSimulator(container) {
-  let activeScenario = null;
-  let currentNodeId = null;
-  let path = [];
+// Module-level state to persist across language toggles
+let activeScenario = null;
+let currentNodeId = null;
+let path = [];
+let isFinished = false;
 
+export function renderSimulator(container) {
   const renderScenarioList = () => {
     container.innerHTML = `
       <div class="section-header reveal">
@@ -39,12 +41,15 @@ export function renderSimulator(container) {
     activeScenario = scenarios[id];
     currentNodeId = activeScenario.start_node;
     path = [];
+    isFinished = false;
     renderNode();
   };
 
   const renderNode = () => {
     const node = activeScenario.nodes[currentNodeId];
-    path.push(currentNodeId);
+    if (path[path.length - 1] !== currentNodeId) {
+      path.push(currentNodeId);
+    }
 
     // Build breadcrumbs
     const breadcrumbs = path.map((n, i) => `<span class="crumb ${i === path.length-1 ? 'active' : ''}">Step ${i+1}</span>`).join(' > ');
@@ -142,6 +147,7 @@ export function renderSimulator(container) {
   };
 
   const renderFinish = () => {
+    isFinished = true;
     container.innerHTML = `
       <div class="glass-card text-center reveal" style="max-width: 600px; margin: 40px auto; padding: var(--space-8);">
         <h2 style="margin-bottom: var(--space-4);">🏁 Simulation Complete</h2>
@@ -149,12 +155,28 @@ export function renderSimulator(container) {
         <button class="btn btn-primary" id="restart-sim">Explore Another Scenario</button>
       </div>
     `;
-    container.querySelector('#restart-sim').addEventListener('click', renderScenarioList);
+    container.querySelector('#restart-sim').addEventListener('click', () => {
+      activeScenario = null;
+      currentNodeId = null;
+      path = [];
+      isFinished = false;
+      renderScenarioList();
+    });
   };
 
-  renderScenarioList();
+  const rerender = () => {
+    if (isFinished) {
+      renderFinish();
+    } else if (activeScenario && currentNodeId) {
+      renderNode();
+    } else {
+      renderScenarioList();
+    }
+  };
+
+  rerender();
   
   return {
-    rerender: renderScenarioList
+    rerender
   };
 }
