@@ -158,7 +158,7 @@ This was my first time building an entire product through prompt-driven developm
 
 ## Try It
 
-- 🔗 **Live demo**: *[URL]*
+- 🔗 **Live demo**: *[https://electiq-791436037194.asia-south1.run.app/](https://electiq-791436037194.asia-south1.run.app/)*
 - 💻 **GitHub**: [github.com/Roopalgn/Promptwars](https://github.com/Roopalgn/Promptwars)
 - 📄 **SECURITY.md**: [Threat model](https://github.com/Roopalgn/Promptwars/blob/main/SECURITY.md)
 - ♿ **ACCESSIBILITY.md**: [WCAG checklist](https://github.com/Roopalgn/Promptwars/blob/main/ACCESSIBILITY.md)

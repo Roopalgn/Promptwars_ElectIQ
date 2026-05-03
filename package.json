@@ -13,7 +13,10 @@
   },
   "dependencies": {
     "dompurify": "^3.1.6",
-    "marked": "^18.0.2"
+    "marked": "^18.0.2",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.0.0",

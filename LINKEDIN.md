@@ -32,9 +32,11 @@ The Google stack that made it possible:
 
 If you've ever skipped voting because the process felt opaque: this app is for you.
 
-🔗 Live demo: [PASTE YOUR DEPLOY URL HERE]
-💻 Code: https://github.com/Roopalgn/Promptwars
-📝 Blog: [PASTE YOUR BLOG URL HERE]
+🔗 Live Demo: https://electiq-791436037194.asia-south1.run.app
+
+📦 Repository: https://github.com/Roopalgn/Promptwars
+
+📝 Blog: https://github.com/Roopalgn/Promptwars/blob/main/BLOG.md
 
 #BuildwithAI #PromptWarsVirtual @Google for Developers @Hack2skill
 

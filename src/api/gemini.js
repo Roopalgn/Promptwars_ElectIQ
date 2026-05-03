@@ -97,8 +97,9 @@ export async function askGemini(userMessage, history = []) {
 
   const apiKey = getApiKey();
 
-  // No API key — answer from offline knowledge base
-  if (!apiKey) {
+  // No API key in dev — answer from offline knowledge base
+  // In production, we always proceed to the backend proxy
+  if (!apiKey && !import.meta.env.PROD) {
     const offline = getOfflineAnswer(clean);
     return (offline || GENERIC_FALLBACK) +
       '\n\n_Tip: Set `VITE_GEMINI_KEY` in your `.env` file for full AI conversations._';
@@ -178,7 +179,12 @@ export async function askGemini(userMessage, history = []) {
  * @returns {Promise<string>} Generated text
  */
 async function callModel(model, apiKey, body) {
-  const url = `${API_BASE}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  // In production (when build key is missing), we use our secure backend proxy
+  // This hides the API key from the frontend and ensures it works in Cloud Run
+  const isProd = import.meta.env.PROD;
+  const url = isProd ? '/api/gemini' : `${API_BASE}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  
+  const requestBody = isProd ? { model, body } : body;
 
   for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
     let res;
@@ -186,7 +192,7 @@ async function callModel(model, apiKey, body) {
       res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(requestBody)
       });
     } catch (networkErr) {
       // Network failure — retry with backoff
@@ -230,6 +236,8 @@ async function callModel(model, apiKey, body) {
  * @returns {boolean}
  */
 export function isApiKeyConfigured() {
+  // In production, we assume the backend proxy has the key
+  if (import.meta.env.PROD) return true;
   return getApiKey() !== null;
 }
 

@@ -4,9 +4,11 @@
 
 An interactive, AI-powered Progressive Web App that teaches Indian citizens how the world's largest democracy actually works — from voter registration to result declaration. Built end-to-end with **Google Antigravity** for **PromptWars Virtual Challenge 2 — Election Process Education**.
 
-🔗 **Live Demo**: *[Deploy and paste URL here before submission]*
+🔗 **Live Demo**: <https://electiq-791436037194.asia-south1.run.app/>
+
 📦 **Repository**: <https://github.com/Roopalgn/Promptwars>
-📝 **Blog**: *[Paste blog URL after publishing]*
+
+📝 **Blog**: *https://github.com/Roopalgn/Promptwars/blob/main/BLOG.md*
 
 ---
 
