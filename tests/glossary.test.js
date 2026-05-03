@@ -27,6 +27,8 @@ describe('Glossary — Rendering and Search', () => {
   it('renders term cards in the grid', async () => {
     const { renderGlossary } = await import('../src/components/glossary.js');
     renderGlossary(container);
+    const expandBtn = container.querySelector('#glossary-expand-btn');
+    if (expandBtn) expandBtn.click();
     const cards = container.querySelectorAll('.glossary-card');
     expect(cards.length).toBeGreaterThan(10);
   });

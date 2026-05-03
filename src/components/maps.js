@@ -102,6 +102,11 @@ export function renderMaps(container) {
             Overview of Election Commission offices and major polling hubs across India.
           </p>
           <div class="maps-container" style="background:var(--bg-elevated); border-radius:var(--radius-md); overflow:hidden;">
+            <noscript>
+              <div style="padding: var(--space-4); text-align: center;">
+                <p>Interactive map requires JavaScript. <a href="https://maps.google.com/maps?q=Election+Commission+offices+India" target="_blank" rel="noopener noreferrer">View on Google Maps</a></p>
+              </div>
+            </noscript>
             <iframe
               class="maps-iframe"
               src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d14500000!2d75.0!3d22.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sElection+Commission+offices+India!5e0!3m2!1sen!2sin"

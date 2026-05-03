@@ -25,14 +25,14 @@ describe('Header — Navigation', () => {
     const { renderHeader } = await import('../src/components/header.js');
     renderHeader(container, vi.fn());
     expect(container.querySelector('.header-logo')).not.toBeNull();
-    expect(container.querySelector('.header-nav')).not.toBeNull();
+    expect(document.body.querySelector('#header-nav')).not.toBeNull();
   });
 
   it('renders all navigation links', async () => {
     const { renderHeader } = await import('../src/components/header.js');
     renderHeader(container, vi.fn());
-    const links = container.querySelectorAll('.header-nav a');
-    expect(links.length).toBe(8);
+    const links = document.body.querySelectorAll('#header-nav a');
+    expect(links.length).toBe(9);
   });
 
   it('includes hamburger menu button', async () => {
@@ -48,8 +48,8 @@ describe('Header — Navigation', () => {
     renderHeader(container, vi.fn());
     const menuBtn = container.querySelector('#header-menu-btn');
     menuBtn.click();
-    const nav = container.querySelector('.header-nav');
-    expect(nav.classList.contains('open')).toBe(true);
+    const nav = document.body.querySelector('#header-nav');
+    expect(nav.classList.contains('active')).toBe(true);
   });
 
   it('calls onLangChange callback when language is toggled', async () => {

@@ -64,10 +64,11 @@ describe('Timeline — Rendering', () => {
     container = document.getElementById('timeline');
   });
 
-  it('renders timeline section with chart container', async () => {
+  it('renders timeline section with nodes', async () => {
     const { renderTimeline } = await import('../src/components/timeline.js');
     renderTimeline(container);
-    expect(container.querySelector('#timeline-chart')).not.toBeNull();
+    expect(container.querySelector('.custom-timeline')).not.toBeNull();
+    expect(container.querySelectorAll('.timeline-node').length).toBeGreaterThan(0);
   });
 
   it('renders legend items for all categories', async () => {
@@ -77,17 +78,18 @@ describe('Timeline — Rendering', () => {
     expect(legends.length).toBe(timelineCategories.length);
   });
 
-  it('chart container has accessible role=img', async () => {
+  it('does not use external iframe or scripts', async () => {
     const { renderTimeline } = await import('../src/components/timeline.js');
     renderTimeline(container);
-    const chart = container.querySelector('#timeline-chart');
-    expect(chart.getAttribute('role')).toBe('img');
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(container.querySelector('script')).toBeNull();
   });
 
-  it('shows loading message while chart loads', async () => {
+  it('renders timeline dates correctly', async () => {
     const { renderTimeline } = await import('../src/components/timeline.js');
     renderTimeline(container);
-    const chart = container.querySelector('#timeline-chart');
-    expect(chart.textContent).toContain('Loading');
+    const dateEl = container.querySelector('.timeline-date');
+    expect(dateEl).not.toBeNull();
+    expect(dateEl.textContent.length).toBeGreaterThan(0);
   });
 });
