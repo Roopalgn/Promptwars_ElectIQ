@@ -236,15 +236,15 @@ function renderFeatureGrid() {
   if (!grid) return;
 
   const features = [
-    { id: 'journey', icon: '📍', title: t('nav.journey'), desc: 'Step-by-step guide from registration to results.' },
-    { id: 'timeline', icon: '📅', title: t('nav.timeline'), desc: 'Explore all the important election phases.' },
-    { id: 'eligibility', icon: '✅', title: t('nav.eligibility'), desc: 'Check if you are eligible to vote.' },
-    { id: 'evm', icon: '🗳️', title: t('nav.evm'), desc: 'Try our interactive EVM simulator.' },
-    { id: 'simulator', icon: '💻', title: 'Simulator', desc: 'Try our advanced election simulator.' },
-    { id: 'quiz', icon: '🧠', title: t('nav.quiz'), desc: 'Test your election knowledge.' },
-    { id: 'pledge', icon: '🤝', title: t('nav.pledge'), desc: 'Take the voter pledge today.' },
-    { id: 'glossary', icon: '📖', title: t('nav.glossary'), desc: 'Learn common election terminology.' },
-    { id: 'maps', icon: '📍', title: t('nav.maps'), desc: 'Find your nearest polling booth.' }
+    { id: 'journey',     icon: '📍', title: t('nav.journey'),     desc: t('dash.journey.desc') },
+    { id: 'timeline',    icon: '📅', title: t('nav.timeline'),    desc: t('dash.timeline.desc') },
+    { id: 'eligibility', icon: '✅', title: t('nav.eligibility'), desc: t('dash.eligibility.desc') },
+    { id: 'evm',         icon: '🗳️', title: t('nav.evm'),         desc: t('dash.evm.desc') },
+    { id: 'simulator',   icon: '💻', title: t('dash.simulator.title'), desc: t('dash.simulator.desc') },
+    { id: 'quiz',        icon: '🧠', title: t('nav.quiz'),        desc: t('dash.quiz.desc') },
+    { id: 'pledge',      icon: '🤝', title: t('nav.pledge'),      desc: t('dash.pledge.desc') },
+    { id: 'glossary',    icon: '📖', title: t('nav.glossary'),    desc: t('dash.glossary.desc') },
+    { id: 'maps',        icon: '📍', title: t('nav.maps'),        desc: t('dash.maps.desc') }
   ];
 
   grid.innerHTML = `
@@ -267,6 +267,7 @@ function renderFeatureGrid() {
 function handleLangChange(_lang) {
   document.documentElement.lang = _lang;
   renderHero();
+  renderFeatureGrid();
   Object.values(components).forEach(c => {
     if (c && typeof c.rerender === 'function') {
       c.rerender();
