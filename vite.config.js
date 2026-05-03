@@ -9,8 +9,8 @@ export default defineConfig({
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['dompurify']
+        manualChunks(id) {
+          if (id.includes('dompurify')) return 'vendor';
         }
       }
     }
